@@ -16,7 +16,7 @@ Window {
         Button{
             text: "try"
             onClicked: {
-                    Backend.tryCommand(textInput.text)
+                    Backend.tryCommand(textInput.editor.text)
                 }
         }
         Button{
@@ -33,12 +33,12 @@ Window {
         }
     }
 
-    TextEdit {
+    Editor {
         id: textInput
 
-        text: "Text Input"
-        font.pixelSize: 20
-        focus: true
+        editor.text: "Text Input"
+        editor.font.pixelSize: 20
+        editor.focus: true
         anchors.top: buttonRow.bottom
         anchors.bottom: textOutput.top
         anchors.left: parent.left
