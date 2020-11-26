@@ -1,45 +1,51 @@
 #include "doublejointmotor.h"
 
-DoubleJointMotor::DoubleJointMotor(unsigned _m1_Step,unsigned _m1_Dir, unsigned _m2_Step,unsigned _m2_Dir,unsigned *_tempo)
+DoubleJointMotor::DoubleJointMotor(int _m1_Step,int _m1_Dir, int _m2_Step,int _m2_Dir,unsigned *_tempo)
 {
     m1_Step=_m1_Step;
     m1_Dir=_m1_Dir;
     m2_Step=_m2_Step;
     m2_Dir=_m2_Dir;
     tempo=_tempo;
-#ifdef ARDUINOVERSION
-    pinMode(m1_Step,OUTPUT;
-    pinMode(m1_Dir,OUTPUT;
-    pinMode(m2_Step,INTPUT;
-    pinMode(m2_Dir,INPUT);
+#ifdef RASPBERRYPI
+    wiringPiSetup();
+    pinMode(m1_Step,OUTPUT);
+    pinMode(m1_Dir,OUTPUT);
+    pinMode(m2_Step,OUTPUT);
+    pinMode(m2_Dir,OUTPUT);
 #endif
 }
-void DoubleJointMotor::step(unsigned _joint, unsigned direction){
-#ifdef ARDUINOVERSION
-        if(_joint){
+void DoubleJointMotor::step(int _joint, int direction){
+#ifdef RASPBERRYPI
+        if(_joint==0){
             if(direction==0){
                 digitalWrite(m1_Dir,HIGH);
-                digitalWrite(m2_Dir,LOW);}
-            else {
-                digitalWrite(m2_Dir,HIGH);
-                digitalWrite(m1_Dir,LOW);}
-            }
-        }
-        else{
-            if(direction==0){
-                digitalWrite(m1_Dir,HIGH);
-                digitalWrite(m2_Dir,HIGH);}
-            else {
                 digitalWrite(m2_Dir,LOW);
-                digitalWrite(m1_Dir,LOW);}
+                //cout<<"J1 +"<<endl;
+            }
+            else {
+                digitalWrite(m1_Dir,LOW);
+                digitalWrite(m2_Dir,HIGH);
+                //cout<<"J1 -"<<endl;
             }
         }
-
+        else if(_joint ==1){
+            if(direction==0){
+                digitalWrite(m1_Dir,HIGH);
+                digitalWrite(m2_Dir,HIGH);
+                //cout<<"J2 +"<<endl;
+            }
+            else {
+                digitalWrite(m1_Dir,LOW);
+                digitalWrite(m2_Dir,LOW);
+                //cout<<"J2 -"<<endl;
+                }
+        }
         digitalWrite(m1_Step,HIGH);
         digitalWrite(m2_Step,HIGH);
-        delayMicroseconds(tempo);
+        usleep(unsigned((*tempo)));
         digitalWrite(m1_Step,LOW);
         digitalWrite(m2_Step,LOW);
-        delayMicroseconds(tempo);
+        usleep(unsigned((*tempo)));
 #endif
 }

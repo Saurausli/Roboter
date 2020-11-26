@@ -1,39 +1,52 @@
 #include "command.h"
 
-Command::Command()
-{
-    DoubleJointMotor dJ(7,8,9,10,&tempo);
+Command::Command(QObject *parent) :
+    QObject(parent){
+    DoubleJointMotor dJ(22,23,24,25,&tempo);
     doubleJointMotor.push_back(dJ);
     joints.push_back(Joint(3680,-3680));
     joints[joints.size()-1].setDoubleJointMotor(&doubleJointMotor[0],0);
-    joints.push_back(Joint(1300,-1300));
+    joints.push_back(Joint(4000,-4000));
     joints[joints.size()-1].setDoubleJointMotor(&doubleJointMotor[0],1);
     tempo=100;
 
 }
+Command::~Command(){
+
+
+}
 
 void Command::checkCommand(string _command){
-    vector<string> commandVec;
-    commandVec=split(_command,' ');
+    vector<vector<string>> commandVec;
+    vector<string> commandVecTemp;
+    commandVecTemp=split(_command,'\n');
+    for(int i=0;i<commandVecTemp.size();i++){
+        commandVec.push_back(split(commandVecTemp[i],' '));
+    }
     for(int i=0;i<commandVec.size();i++){
-        if(commandVec[i]==SET_SYNTAX_NAME){
-
-        }
-        else if(commandVec[i]==TURN_SYNTAX_NAME){
-            turn(commandVec,i);
-        }
-        else if(commandVec[i]==TEMPO_SYNTAX){
-            if(commandVec.size()>i){
-                tempo=std::stoi(commandVec[i+1]);
-                printRespond("new Tempo "+std::to_string(tempo));
+        for(int j=0;j<commandVec[i].size();j++){
+            if(commandVec[i][j]==SET_SYNTAX_NAME){
+                return;
+            }
+            else if(commandVec[i][j]==TURN_SYNTAX_NAME){
+                turn(commandVec[i],i);
+                return;
+            }
+            else if(commandVec[i][j]==TEMPO_SYNTAX){
+                if(commandVec.size()>i){
+                    tempo=std::stoi(commandVec[i][j+1]);
+                    printRespond("new Tempo "+std::to_string(tempo));
+                }
+                return;
             }
         }
     }
+    printRespond("Error: Syntax unkown");
 }
 
 void Command::turn(vector<string> command,int syntaxInedx){
     if(command.size()<syntaxInedx+2){
-        printRespond("Error: Command for Turn to short: Example J4 turn 100 steps left");
+        printRespond("Error: Command for Turn to short: Example J4 turn 100");
     }
     else{
         Joint *j;
@@ -68,9 +81,6 @@ vector<string> Command::split(string str, char delimiter) {
 }
 
 void Command::printRespond(string respond){
-#ifdef ARDUINOVERSION
-    Serial.println(respond);
-#else
-     cout<<respond<<endl;
-#endif
+    output=respond+'\n'+output;
+    emit newRespond(QString::fromStdString(output));
 }

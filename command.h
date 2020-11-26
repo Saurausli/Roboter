@@ -1,7 +1,7 @@
 #ifndef COMMAND_H
 #define COMMAND_H
 
-
+#include <QObject>
 #include <vector>
 #include <string>
 #include <sstream>
@@ -17,22 +17,30 @@
 
 using namespace std;
 
-class Command
+class Command:public QObject
 {
+    Q_OBJECT
 public:
-    Command();
+    explicit Command(QObject *parent= nullptr);
+    ~Command();
     void checkCommand(string _command);
 
 
     void setPos(vector<string> command,int syntaxInedx);
     void turn(vector<string> command,int syntaxInedx);
 
+signals:
+    void newRespond(QString output);
+
 private:
    vector<string> split(string str, char delimiter);
    vector<Joint> joints;
    unsigned tempo;
+   string output;
    vector<DoubleJointMotor> doubleJointMotor;
    void printRespond(string respond);
+
+
 };
 
 #endif // COMMAND_H

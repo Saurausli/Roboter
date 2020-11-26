@@ -1,22 +1,26 @@
 #ifndef DOUBLEJOINTMOTOR_H
 #define DOUBLEJOINTMOTOR_H
 //#define ARDUINOVERSION
-
-#ifdef ARDUINOVERSION
-#include "arduino.h"
+#include <iostream>
+#include<chrono>
+#include<thread>
+#ifdef RASPBERRYPI
+    #include "wiringPi.h"
+    #include <unistd.h>
 #endif
+using namespace std;
 class DoubleJointMotor
 {
 public:
-    DoubleJointMotor(unsigned _m1_Step,unsigned _m1_Dir, unsigned _m2_Step,unsigned _m2_Dir,unsigned* _tempo);
-    void step(unsigned _joint, unsigned direction);
+    DoubleJointMotor(int _m1_Step,int _m1_Dir, int _m2_Step,int _m2_Dir,unsigned* _tempo);
+    void step(int _joint, int direction);
 
 
 private:
-    unsigned m1_Step;
-    unsigned m1_Dir;
-    unsigned m2_Step;
-    unsigned m2_Dir;
+    int m1_Step;
+    int m1_Dir;
+    int m2_Step;
+    int m2_Dir;
     unsigned *tempo;
 };
 

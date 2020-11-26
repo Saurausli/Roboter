@@ -1,6 +1,7 @@
 #include <iostream>
 #include <command.h>
-
+#include <QApplication>
+#include "consoleui.h"
 #define ARDUINOVERSION
 
 
@@ -9,15 +10,16 @@
 using namespace std;
 
 
-int main()
+int main(int argc, char *argv[])
 {
-    Command com;
-    while(true){
-        string command;
+    QApplication a(argc, argv);
+    //MainWindow w;
+    //
+    ConsoleUi ui;
 
-        std::getline (std::cin,command);
-        cout<<command<<endl;
-        com.checkCommand(command);
-    }
-    return 0;
+
+    //w.show();
+
+
+    return a.exec();
 }
