@@ -37,20 +37,22 @@ Window {
         id: textInput
 
         editor.text: "Text Input"
-        editor.font.pixelSize: 20
+        editor.font.pixelSize: 15
         editor.focus: true
         anchors.top: buttonRow.bottom
         anchors.bottom: textOutput.top
         anchors.left: parent.left
         anchors.right: parent.horizontalCenter
         anchors.margins: 20
+        live:true
     }
-    Text {
+    Editor {
         id: runningCode
 
-        text: "Text Input"
-        font.pixelSize: 15
+        editor.text: "Text Input"
+        editor.font.pixelSize: 15
         focus: true
+        editor.focus: false
         anchors.margins: 20
         anchors.top: buttonRow.bottom
         anchors.bottom: textOutput.top
@@ -70,6 +72,9 @@ Window {
             target: Backend
             function onNewRespond(output){
                 textOutput.text=output
+            }
+            function onNewRunningProgramm(programm){
+                runningCode.text=programm
             }
         }
     }

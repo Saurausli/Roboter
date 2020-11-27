@@ -3,9 +3,10 @@
 
 #include <QObject>
 #include <vector>
-#include <string>
+#include <QString>
 #include <sstream>
 #include <iostream>
+
 #include "joint.h"
 #include "doublejointmotor.h"
 
@@ -23,22 +24,24 @@ class Command:public QObject
 public:
     explicit Command(QObject *parent= nullptr);
     ~Command();
-    void checkCommand(string _command);
+    void checkCommand(QString _command);
 
 
-    void setPos(vector<string> command,int syntaxInedx);
-    void turn(vector<string> command,int syntaxInedx);
-
+    void setPos(vector<QString> command,int syntaxInedx);
+    void turn(vector<QString> command,int syntaxInedx);
+    void setTempo(vector<QString> command,int syntaxInedx);
 signals:
     void newRespond(QString output);
+    void newRunningProgramm(QString programm);
+    void newRunningCommand(int commandLine);
 
 private:
-   vector<string> split(string str, char delimiter);
+   vector<QString> split(QString _str, char delimiter);
    vector<Joint> joints;
    unsigned tempo;
-   string output;
+   QString output;
    vector<DoubleJointMotor> doubleJointMotor;
-   void printRespond(string respond);
+   void printRespond(QString respond);
 
 
 };

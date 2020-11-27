@@ -16,9 +16,10 @@ Command::~Command(){
 
 }
 
-void Command::checkCommand(string _command){
-    vector<vector<string>> commandVec;
-    vector<string> commandVecTemp;
+void Command::checkCommand(QString _command){
+
+    vector<vector<QString>> commandVec;
+    vector<QString> commandVecTemp;
     commandVecTemp=split(_command,'\n');
     for(int i=0;i<commandVecTemp.size();i++){
         commandVec.push_back(split(commandVecTemp[i],' '));
@@ -33,10 +34,7 @@ void Command::checkCommand(string _command){
                 return;
             }
             else if(commandVec[i][j]==TEMPO_SYNTAX){
-                if(commandVec.size()>i){
-                    tempo=std::stoi(commandVec[i][j+1]);
-                    printRespond("new Tempo "+std::to_string(tempo));
-                }
+                setTempo(commandVec[i],i);
                 return;
             }
         }
@@ -44,7 +42,8 @@ void Command::checkCommand(string _command){
     printRespond("Error: Syntax unkown");
 }
 
-void Command::turn(vector<string> command,int syntaxInedx){
+void Command::turn(vector<QString> command,int syntaxInedx){
+    emit newRunningCommand(syntaxInedx);
     if(command.size()<syntaxInedx+2){
         printRespond("Error: Command for Turn to short: Example J4 turn 100");
     }
@@ -60,27 +59,36 @@ void Command::turn(vector<string> command,int syntaxInedx){
             printRespond("Error: Joint not found");
             return;
         }
-        j->turnPosition(std::stoi(command[syntaxInedx+1]));
+        j->turnPosition(command[syntaxInedx+1].toInt());
     }
 }
 
-void Command::setPos(vector<string> command,int syntaxInedx){
+void Command::setTempo(vector<QString> command,int syntaxInedx){
+    emit newRunningCommand(syntaxInedx);
+    if(command.size()>syntaxInedx){
+        tempo=command[syntaxInedx+1].toInt();
+        printRespond("new Tempo "+QString::number(tempo));
+    }
+}
+
+void Command::setPos(vector<QString> command,int syntaxInedx){
 
 }
 
-vector<string> Command::split(string str, char delimiter) {
-  vector<string> internal;
+vector<QString> Command::split(QString _str, char delimiter) {
+  string str=_str.toStdString();
+    vector<QString> internal;
   stringstream ss(str); // Turn the string into a stream.
   string tok;
 
   while(getline(ss, tok, delimiter)) {
-    internal.push_back(tok);
+    internal.push_back(QString::fromStdString(tok));
   }
 
   return internal;
 }
 
-void Command::printRespond(string respond){
+void Command::printRespond(QString respond){
     output=respond+'\n'+output;
-    emit newRespond(QString::fromStdString(output));
+    emit newRespond(output);
 }

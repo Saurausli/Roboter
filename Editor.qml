@@ -8,7 +8,15 @@ Flickable {
      contentWidth: te.paintedWidth
      contentHeight: te.paintedHeight
      clip: true
+     property bool live: false
      property alias editor: te
+     property int liveCommand: 0
+     Connections{
+         target: Backend
+         function onNewRunningCommand(commandLine){
+             liveCommand=commandLine
+         }
+     }
 
     boundsMovement: Flickable.StopAtBounds
     ScrollBar.vertical: ScrollBar {
@@ -39,6 +47,13 @@ Flickable {
              width: root.width
              color: "#e7e7e7"
              visible: te.activeFocus
+         }
+         Rectangle {
+             x: 0; y: liveCommand.y
+             height: fontMetrics.height
+             width: root.width
+             color: "limegreen"
+             visible: live
          }
          Text{
              id: num

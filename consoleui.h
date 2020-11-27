@@ -7,7 +7,7 @@
 #include <vector>
 #include "command.h"
 
-class ConsoleUi: public QObject
+class ConsoleUi: public Command
 {
     Q_OBJECT
 public:
@@ -15,16 +15,14 @@ public:
     ~ConsoleUi();
 
 signals:
-    void newRespond(QString respond);
+
 public slots:
     void tryCommand(QString command);
     void loopCommand(QString command);
     void stop();
-    void printRespond(QString output);
 private:
     QQmlApplicationEngine *engine;
     QQmlContext* context;
-    Command* com;
     bool run;
     void runCommand(QString command);
 };
