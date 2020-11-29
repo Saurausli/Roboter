@@ -1,20 +1,32 @@
 #ifndef JOINT_H
 #define JOINT_H
 #include "doublejointmotor.h"
+#include <QThread>
 
-class Joint
+#include <QObject>
+#include <QDebug>
+
+class Joint: public QThread
 {
+    Q_OBJECT
 public:
-    Joint(int _max, int _min);
+    explicit Joint(int _max, int _min,QObject *parent = nullptr);
+    ~Joint();
+    void run();
     void setDoubleJointMotor(DoubleJointMotor *_dJM,unsigned _joint);
-    bool setPosition(int _pos);
-    bool turnPosition(int _steps);
+    int getMax();
+    int getMin();
 
     void setMax(int _max);
-    int getMax();
 
     void setMin(int _min);
-    int getMin();
+    bool setPosition(int _pos);
+    void turnPosition(int _steps);
+
+signals:  
+    void commandFinished();
+private slots:
+    void positionChanged(int _joint, int _direction);
 private:
     void moveJoint();
     bool checkPosition(int _pos);

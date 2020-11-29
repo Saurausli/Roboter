@@ -1,10 +1,11 @@
-QT += core gui qml quick quickwidgets sql quickcontrols2
+QT += core gui qml quick quickwidgets sql quickcontrols2 serialport
 CONFIG += c++11
 TEMPLATE = app
-#DEFINES += RASPBERRYPI
+
+DEFINES += RASPBERRYPI
 DEFINES += QT_DEPRECATED_WARNINGS
-#LIBS += -L/usr/local/lib -lwiringPi
-#INCLUDEPATH += /usr/local/include
+LIBS += -L/usr/local/lib -lwiringPi
+INCLUDEPATH += /usr/local/include
 
 SOURCES += \
         command.cpp \

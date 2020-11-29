@@ -1,6 +1,6 @@
-import QtQuick 2.12
-import QtQuick.Window 2.12
-import QtQuick.Controls 2.12
+import QtQuick 2.10
+import QtQuick.Controls 2.4
+import QtQuick.Window 2.10
 Window {
     id:window
     width: 800
@@ -17,65 +17,97 @@ Window {
             text: "try"
             onClicked: {
                     Backend.tryCommand(textInput.editor.text)
+
                 }
         }
         Button{
             text: "stop"
             onClicked: {
-                    Backend.stop()
+                    Backend.stopJoints()
                 }
         }
         Button{
             text: "loop"
             onClicked: {
-                    Backend.loopCommand(textInput.text)
+                    stopButton.visible=true;
+                    Backend.loopCommand(textInput.editor.text)
+
                 }
+        }
+        Button{
+            id:stopButton
+            visible: false
+            text: "stop Loop"
+            onClicked: {
+                Backend.stopLoop()
+            }
         }
     }
 
     Editor {
         id: textInput
 
-        editor.text: "Text Input"
+        editor.text: ""
         editor.font.pixelSize: 15
         editor.focus: true
         anchors.top: buttonRow.bottom
-        anchors.bottom: textOutput.top
+        anchors.bottom: respondsButtons.top
         anchors.left: parent.left
         anchors.right: parent.horizontalCenter
         anchors.margins: 20
-        live:true
+        live:false
     }
     Editor {
         id: runningCode
 
-        editor.text: "Text Input"
+        editor.text: ""
         editor.font.pixelSize: 15
         focus: true
         editor.focus: false
         anchors.margins: 20
         anchors.top: buttonRow.bottom
-        anchors.bottom: textOutput.top
+        anchors.bottom: respondsButtons.top
         anchors.right: parent.right
         anchors.left: parent.horizontalCenter
+        live: true
+    }
+    Row{
+        id:respondsButtons
+        anchors.margins:5
+        spacing: 10
+        height: 20
+        anchors.bottom: textOutput.top
+        anchors.left: parent.left
+        Button{
+            text: "clear"
+            onClicked: {
+                    textOutput.text=""
+
+                }
+            font.pixelSize: 15
+            height: 20
+            width:implicitWidth
+        }
+
     }
     Text {
         id: textOutput
         height: 250
-        text: qsTr("text")
+        text: qsTr("")
         font.pixelSize: 15
         anchors.margins: 20
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: parent.right
-        Connections{
-            target: Backend
-            function onNewRespond(output){
-                textOutput.text=output
-            }
-            function onNewRunningProgramm(programm){
-                runningCode.text=programm
-            }
+
+    }
+    Connections{
+        target: Backend
+        onNewRespond:{
+            textOutput.text=output+'\n'+textOutput.text
+        }
+        onNewRunningProgramm:{
+            runningCode.editor.text=programm
         }
     }
 }

@@ -1,16 +1,29 @@
 #include "joint.h"
 
-Joint::Joint(int _max, int _min)
+Joint::Joint(int _max, int _min,QObject *parent):
+    QThread (parent)
 {
     setMax(_max);
     setMin(_min);
     position=0;
 }
+
+Joint::~Joint(){
+
+}
+
+void Joint::run(){
+
+    moveJoint();
+    emit commandFinished();
+}
+
 void Joint::setDoubleJointMotor(DoubleJointMotor *_dJM,unsigned _joint){
     dJM=_dJM;
     if(_joint<2){
         joint=_joint;
         doubleJointMotorEnable=true;
+        connect(dJM,SIGNAL(executedStep(int,int)),this,SLOT(positionChanged(int,int)));
     }
 }
 
@@ -24,14 +37,13 @@ bool Joint::setPosition(int _pos){
     }
     return false;
 }
-bool Joint::turnPosition(int _steps){
-    cout<<"turn Position: lets turn position "<<_steps<<" "<<position<<endl;
+
+void Joint::turnPosition(int _steps){
     if(checkPosition(_steps+position)){
         target=_steps+position;
         moveJoint();
-        return true;
     }
-    return false;
+
 }
 
 void Joint::setMax(int _max){
@@ -47,20 +59,28 @@ void Joint::setMin(int _min){
 int Joint::getMin(){
     return min;
 }
+void Joint::positionChanged(int _joint, int _direction){
+    if(_joint==joint){
+        if(_direction==0){
+            position--;
+        }
+        else if(_direction==1){
+            position++;
+        }
+        if(!checkPosition(position)){
+            dJM->running=false;
+        }
+    }
+}
 
 void Joint::moveJoint(){
     if(target<position){
-        while(target<position){
-            dJM->step(joint,0);
-            position--;
-        }
+            dJM->move(position-target,joint,0);
     }
     else if(target>position){
-        while(target>position){
-            dJM->step(joint,1);
-            position++;
-        }
+            dJM->move(target-position,joint,1);
     }
+    dJM->start();
 }
 
 bool Joint::checkPosition(int _pos){

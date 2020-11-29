@@ -15,16 +15,14 @@ public:
     ~ConsoleUi();
 
 signals:
-
+    void getStop();
 public slots:
     void tryCommand(QString command);
     void loopCommand(QString command);
-    void stop();
+    void stopLoop();
 private:
     QQmlApplicationEngine *engine;
     QQmlContext* context;
-    bool run;
-    void runCommand(QString command);
 };
 
 #endif // CONSOLEUI_H

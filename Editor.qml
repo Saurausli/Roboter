@@ -1,5 +1,5 @@
-import QtQuick 2.15
-import QtQuick.Controls 2.15
+import QtQuick 2.10
+import QtQuick.Controls 2.4
 
 Flickable {
      id: editor
@@ -10,11 +10,23 @@ Flickable {
      clip: true
      property bool live: false
      property alias editor: te
-     property int liveCommand: 0
+     property int liveCommand: -1
+     property variant error: []
      Connections{
          target: Backend
-         function onNewRunningCommand(commandLine){
+         onNewRunningCommand:{
              liveCommand=commandLine
+         }
+         onErrorOccured:{
+             console.debug(line,error,error.length)
+             error[error.length]=line
+             var a=[];
+             a=error
+             error=a
+             console.debug(line,error)
+         }
+         onNewRunningProgramm:{
+             error=[]
          }
      }
 
@@ -49,12 +61,25 @@ Flickable {
              visible: te.activeFocus
          }
          Rectangle {
-             x: 0; y: liveCommand.y
+             x: 0;
+             y: liveCommand*fontMetrics.height
              height: fontMetrics.height
              width: root.width
              color: "limegreen"
              visible: live
          }
+         Repeater{
+             model: error
+             Rectangle{
+                 x: 0;
+                 y: error[index]*fontMetrics.height
+                 height: fontMetrics.height
+                 width: root.width
+                 color: "red"
+                 visible: live
+             }
+         }
+
          Text{
              id: num
              anchors.left: parent.left
@@ -72,9 +97,18 @@ Flickable {
              width: flick.width
              anchors.top: parent.top
              wrapMode: TextEdit.Wrap
+             selectByMouse: true
             onCursorRectangleChanged: editor.ensureVisible(cursorRectangle)
          }
+         MouseArea{
+             anchors.fill: parent
+             onClicked: {
+                 te.focus=true
+             }
+         }
      }
+
+
      function ensureVisible(r)
      {
          if (contentX >= r.x)
