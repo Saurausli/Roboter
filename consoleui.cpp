@@ -1,7 +1,7 @@
 #include "consoleui.h"
 
 ConsoleUi::ConsoleUi(QObject *parent) :
-    Command(parent){
+    Programm(parent){
     engine = new QQmlApplicationEngine(this);
     context = engine->rootContext();
     context->setContextProperty ("Backend", this);
@@ -13,14 +13,14 @@ ConsoleUi::~ConsoleUi(){
 
 }
 
-void ConsoleUi::tryCommand(QString command){
-    checkCommand(command);
-    emit newRunningProgramm(command);
+void ConsoleUi::tryCommand(QString programm){
+    checkProgramm(programm);
+    emit newRunningProgramm(programm);
 }
-void ConsoleUi::loopCommand(QString command){
+void ConsoleUi::loopCommand(QString programm){
     loop=true;
-    checkCommand(command);
-    emit newRunningProgramm(command);
+    checkProgramm(programm);
+    emit newRunningProgramm(programm);
 }
 
 void ConsoleUi::stopLoop(){

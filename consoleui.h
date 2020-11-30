@@ -5,9 +5,9 @@
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
 #include <vector>
-#include "command.h"
+#include "programm.h"
 
-class ConsoleUi: public Command
+class ConsoleUi: public Programm
 {
     Q_OBJECT
 public:
@@ -17,8 +17,8 @@ public:
 signals:
     void getStop();
 public slots:
-    void tryCommand(QString command);
-    void loopCommand(QString command);
+    void tryCommand(QString programm);
+    void loopCommand(QString programm);
     void stopLoop();
 private:
     QQmlApplicationEngine *engine;
