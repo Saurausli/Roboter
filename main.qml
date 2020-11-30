@@ -103,8 +103,13 @@ Window {
     }
     Connections{
         target: Backend
-        onNewRespond:{
-            textOutput.text=output+'\n'+textOutput.text
+        onErrorOccured:{
+            var err=[]
+            textOutput.text=""
+            err=Backend.getErrorMessageVec();
+            for(var i=0;i<err.length;i++){
+                textOutput.text=err[i]+'\n'+textOutput.text
+            }
         }
         onNewRunningProgramm:{
             runningCode.editor.text=programm

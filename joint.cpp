@@ -1,10 +1,11 @@
 #include "joint.h"
 
-Joint::Joint(int _max, int _min,QObject *parent):
+Joint::Joint(QString _name,int _max, int _min,QObject *parent):
     QThread (parent)
 {
     setMax(_max);
     setMin(_min);
+    name=_name;
     position=0;
 }
 
@@ -44,6 +45,10 @@ void Joint::turnPosition(int _steps){
         moveJoint();
     }
 
+}
+
+QString Joint::getName(){
+    return name;
 }
 
 void Joint::setMax(int _max){

@@ -8,25 +8,21 @@ Flickable {
      contentWidth: te.paintedWidth
      contentHeight: te.paintedHeight
      clip: true
+
      property bool live: false
      property alias editor: te
      property int liveCommand: -1
-     property variant error: []
+     property variant errorLine: []
      Connections{
          target: Backend
          onNewRunningCommand:{
              liveCommand=commandLine
          }
          onErrorOccured:{
-             console.debug(line,error,error.length)
-             error[error.length]=line
-             var a=[];
-             a=error
-             error=a
-             console.debug(line,error)
+             errorLine=Backend.getErrorLineVec();
          }
          onNewRunningProgramm:{
-             error=[]
+             //errorLine=[]
          }
      }
 
@@ -58,7 +54,7 @@ Flickable {
              height: fontMetrics.height
              width: root.width
              color: "#e7e7e7"
-             visible: te.activeFocus
+             visible: live&&te.activeFocus
          }
          Rectangle {
              x: 0;
@@ -69,10 +65,10 @@ Flickable {
              visible: live
          }
          Repeater{
-             model: error
+             model: errorLine.length
              Rectangle{
                  x: 0;
-                 y: error[index]*fontMetrics.height
+                 y: errorLine[index]*fontMetrics.height
                  height: fontMetrics.height
                  width: root.width
                  color: "red"

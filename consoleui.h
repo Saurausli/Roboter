@@ -20,6 +20,8 @@ public slots:
     void tryCommand(QString programm);
     void loopCommand(QString programm);
     void stopLoop();
+    QVector<int> getErrorLineVec();
+    QVector<QString> getErrorMessageVec();
 private:
     QQmlApplicationEngine *engine;
     QQmlContext* context;

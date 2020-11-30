@@ -26,3 +26,19 @@ void ConsoleUi::loopCommand(QString programm){
 void ConsoleUi::stopLoop(){
     loop=false;
 }
+
+QVector<int> ConsoleUi::getErrorLineVec(){
+   QVector<int> vec;
+   for(int i=0;i<int(errorList.size());i++){
+        vec.push_back(errorList[i].getLine());
+   }
+   return vec;
+}
+
+QVector<QString> ConsoleUi::getErrorMessageVec(){
+   QVector<QString> vec;
+   for(int i=0;i<int(errorList.size());i++){
+        vec.push_back(errorList[i].getMessage());
+   }
+   return vec;
+}
