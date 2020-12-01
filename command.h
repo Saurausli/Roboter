@@ -8,6 +8,7 @@
 #include "joint.h"
 
 
+
 #define TURN_SYNTAX_NAME "turn"
 
 #define SET_SYNTAX_NAME "set"
@@ -16,13 +17,17 @@
 
 #define PAUSE_SYNTAX "pause"
 
+#define DEF_DOUBLEMOTOR_SYNTAX "Doublemotor"
+
+#define DEF_JOINT_SYNTAX "Joint"
 enum Function{
     error   =-1,
     empty   =0,
     turn    =1,
     set     =2,
     tempo   =3,
-    pause   =4
+    pause   =4,
+    def     =5
 };
 
 struct GlobalVariables{

@@ -7,6 +7,7 @@ ConsoleUi::ConsoleUi(QObject *parent) :
     context->setContextProperty ("Backend", this);
     engine->load(QUrl(QStringLiteral("qrc:/main.qml")));
     loop=false;
+
 }
 
 ConsoleUi::~ConsoleUi(){
@@ -41,4 +42,11 @@ QVector<QString> ConsoleUi::getErrorMessageVec(){
         vec.push_back(errorList[i].getMessage());
    }
    return vec;
+}
+
+QString ConsoleUi::loadFile(){
+    std::ifstream savefile("savefile.txt");
+    stringstream buffer;
+    buffer<<savefile.rdbuf();
+    return QString::fromStdString(buffer.str());
 }

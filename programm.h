@@ -12,7 +12,7 @@
 #include <QDebug>
 #include "error.h"
 #include "command.h"
-
+#include <fstream>
 
 using namespace std;
 

@@ -17,6 +17,7 @@ Command::~Command(){
 
 void Command::checkCommand(){
     try{
+
         vector<QString> commandVec;
         commandVec=split(command,' ');
         if(commandVec.size()>0){
@@ -65,7 +66,19 @@ void Command::checkCommand(){
                     er->addToMessage("set");
                     throw er;
                 }
-               }
+            }
+            else if(commandVec[0]==DEF_DOUBLEMOTOR_SYNTAX){
+                try{
+                    function=Function::set;
+                    checkLength(&commandVec,3);
+                    setJoint(commandVec[1]);
+                    checkNumber(commandVec[2]);
+                }
+                catch(Error *er){
+                    er->addToMessage("set");
+                    throw er;
+                }
+            }
 
 
             else {

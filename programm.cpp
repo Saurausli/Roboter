@@ -28,6 +28,9 @@ Programm::~Programm(){
 }
 
 void Programm::checkProgramm(QString _Programm){
+    ofstream file("savefile.txt");
+    file<< _Programm.toStdString();
+    file.close();
     vector<QString> ProgrammVecTemp;
     ProgrammVecTemp=Command::split(_Programm,'\n');
     programmVec.clear();

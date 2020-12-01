@@ -22,6 +22,8 @@ public slots:
     void stopLoop();
     QVector<int> getErrorLineVec();
     QVector<QString> getErrorMessageVec();
+    QString loadFile();
+
 private:
     QQmlApplicationEngine *engine;
     QQmlContext* context;

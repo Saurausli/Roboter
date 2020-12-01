@@ -7,6 +7,10 @@ Window {
     height:600
     visible: true
     title: qsTr("Console")
+    Component.onCompleted: {
+        textInput.editor.text=Backend.loadFile();
+    }
+
     Row{
         id:buttonRow
         anchors.margins:10
