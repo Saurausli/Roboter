@@ -76,6 +76,9 @@ void Joint::positionChanged(int _joint, int _direction){
             dJM->running=false;
         }
     }
+    if(position==target){
+        emit commandFinished();
+    }
 }
 
 void Joint::moveJoint(){

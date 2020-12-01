@@ -27,7 +27,8 @@ Programm::~Programm(){
 
 }
 
-void Programm::checkProgramm(QString _Programm){
+
+bool Programm::checkProgramm(QString _Programm){
     ofstream file("savefile.txt");
     file<< _Programm.toStdString();
     file.close();
@@ -47,28 +48,22 @@ void Programm::checkProgramm(QString _Programm){
     }
     emit errorOccured();
     if(errorList.size()>0){
-
+        return false;
     }
     else{
         runningCommand=0;
+        return true;
     }
 }
 
-
-/*
-void  Programm::pause(vector<QString> Programm){
-    if(Programm.size()==2){
-        qDebug()<<"set Timer";
-        QTimer::singleShot(Programm[1].toInt(), this, SLOT(ProgrammFinishedSlot()));
-    }
-    else{
-       //printError("Error: Programm for Turn to short: Example pause 100",runningCommand);
-    }
-}*/
 void Programm::stopJoints(){
     for(int i=0;i<globalVaribles.doubleJointMotor.size();i++){
         globalVaribles.doubleJointMotor[i]->running=false;
     }
+    for(int i=0;i<(programmVec.size()-1);i++){
+        disconnect(programmVec[i],SIGNAL(commandFinished()),programmVec[i+1],SLOT(exec()));
+    }
+    disconnect(programmVec[programmVec.size()-1],SIGNAL(commandFinished()),programmVec[0],SLOT(exec()));
 }
 /*
 void Programm::setPos(vector<QString> Programm){
@@ -80,3 +75,5 @@ void Programm::setPos(vector<QString> Programm){
         j->setPosition(Programm[2].toInt());
     }
 }*/
+
+

@@ -4,6 +4,7 @@
 #include <QObject>
 #include <sstream>
 #include <iostream>
+#include <QTimer>
 #include "error.h"
 #include "joint.h"
 
@@ -49,8 +50,13 @@ class Command:public QObject
         ~Command();
         void checkCommand();
         Function getFunction();
-        void exec();
+
         static vector<QString> split(QString _str, char delimiter);
+    public slots:
+        void exec();
+
+    signals:
+        void commandFinished();
     private:
         unsigned int programmLine;
         QString command;
@@ -60,6 +66,8 @@ class Command:public QObject
         void setJoint(QString name);
         void checkNumber(QString number);
         void checkLength(vector<QString> *com,unsigned long len);
+    private slots:
+        void commandFinishedSlot();
 };
 
 

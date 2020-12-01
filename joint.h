@@ -25,6 +25,7 @@ public:
     QString getName();
 signals:  
     void commandFinished();
+
 private slots:
     void positionChanged(int _joint, int _direction);
 private:

@@ -95,6 +95,28 @@ void Command::checkCommand(){
         throw er;
     }
 }
+void Command::exec(){
+    vector<QString> commandVec;
+    commandVec=split(command,' ');
+    qDebug()<<"Command "<<programmLine;
+    switch (function) {
+           case pause:
+                QTimer::singleShot(commandVec[1].toInt(), this, SLOT(commandFinishedSlot()));
+                break;
+            case set:
+                joint->setPosition(commandVec[2].toInt());
+                commandFinishedSlot();
+                break;
+            case turn:
+                connect(joint,SIGNAL(commandFinished()),this,SLOT(commandFinishedSlot()));
+                joint->turnPosition(commandVec[2].toInt());
+
+                break;
+            case tempo:
+                globalVariables->tempo=commandVec[1].toInt();
+                break;
+    }
+}
 /*else{
     if(loop){
         runningCommand=0;
@@ -147,4 +169,14 @@ void Command::checkLength(vector<QString> *com,unsigned long len){
     if(com->size()<len){
         throw(new Error(programmLine,"to few arguments",command));
     }
+}
+
+void Command::commandFinishedSlot(){
+    switch (function) {
+            case turn:
+                disconnect(joint,SIGNAL(commandFinished()),this,SLOT(commandFinishedSlot()));
+                break;
+    }
+    qDebug()<<"Finished";
+    emit commandFinished();
 }

@@ -16,16 +16,27 @@ ConsoleUi::~ConsoleUi(){
 
 void ConsoleUi::tryCommand(QString programm){
     checkProgramm(programm);
+    if(checkProgramm(programm)){
+        for(int i=0;i<(programmVec.size()-1);i++){
+            connect(programmVec[i],SIGNAL(commandFinished()),programmVec[i+1],SLOT(exec()));
+        }
+        programmVec[0]->exec();
+    }
     emit newRunningProgramm(programm);
+
 }
 void ConsoleUi::loopCommand(QString programm){
     loop=true;
-    checkProgramm(programm);
-    emit newRunningProgramm(programm);
+    if(checkProgramm(programm)){
+        connect(programmVec[programmVec.size()-1],SIGNAL(commandFinished()),programmVec[0],SLOT(exec()));
+        connect(programmVec[programmVec.size()-1],SIGNAL(commandFinished()),this,SIGNAL(newRunningCommand()));
+    }
+    tryCommand(programm);
 }
 
 void ConsoleUi::stopLoop(){
     loop=false;
+    disconnect(programmVec[programmVec.size()-1],SIGNAL(commandFinished()),programmVec[0],SLOT(exec()));
 }
 
 QVector<int> ConsoleUi::getErrorLineVec(){

@@ -24,7 +24,7 @@ class Programm:public QObject
 public:
     explicit Programm(QObject *parent= nullptr);
     ~Programm();
-    void checkProgramm(QString _Programm);
+    bool checkProgramm(QString _Programm);
 signals:
     void newRespond(QString output);
     void newRunningProgramm(QString programm);
@@ -40,8 +40,9 @@ protected:
     ErrorList errorList;
     GlobalVariables globalVaribles;
     int runningCommand;
+    vector<Command*> programmVec;
 private:
-   vector<Command*> programmVec;
+
 private slots:
 
 };

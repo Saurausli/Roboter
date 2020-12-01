@@ -54,7 +54,7 @@ Flickable {
              height: fontMetrics.height
              width: root.width
              color: "#e7e7e7"
-             visible: live&&te.activeFocus
+             visible: !live&&te.activeFocus
          }
          Rectangle {
              x: 0;
@@ -94,6 +94,7 @@ Flickable {
              anchors.top: parent.top
              wrapMode: TextEdit.Wrap
              selectByMouse: true
+             enabled: !live
             onCursorRectangleChanged: editor.ensureVisible(cursorRectangle)
          }
          MouseArea{
