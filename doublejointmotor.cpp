@@ -27,12 +27,14 @@ void DoubleJointMotor::move(int _steps,int _joint, int _direction){
 }
 void DoubleJointMotor::run(){
     QMutex mutex;
+    qDebug()<<"run";
     mutex.lock();
     running=true;
     mutex.unlock();
     for(int i=0;i<steps;i++){
         QMutex mutex;
         mutex.lock();
+        qDebug()<<i;
         if(running){
             mutex.unlock();
             step();
@@ -77,6 +79,7 @@ void DoubleJointMotor::step(){
         digitalWrite(m2_Step,HIGH);
 #endif
         usleep(unsigned((*tempo)));
+
         #ifdef RASPBERRYPI
         digitalWrite(m1_Step,LOW);
         digitalWrite(m2_Step,LOW);

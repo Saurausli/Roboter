@@ -25,6 +25,8 @@ public:
     explicit Programm(QObject *parent= nullptr);
     ~Programm();
     bool checkProgramm(QString _Programm);
+    void connectProgramm(bool _loop);
+    void startProgramm();
 signals:
     void newRespond(QString output);
     void newRunningProgramm(QString programm);
@@ -44,7 +46,7 @@ protected:
 private:
 
 private slots:
-
+    void newRunningCommandSlot(int lineID);
 };
 
 #endif // Programm_H

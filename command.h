@@ -56,6 +56,7 @@ class Command:public QObject
         void exec();
 
     signals:
+        void commandStart(int line);
         void commandFinished();
     private:
         unsigned int programmLine;

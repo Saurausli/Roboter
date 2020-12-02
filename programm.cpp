@@ -1,4 +1,4 @@
-#include "Programm.h"
+#include "programm.h"
 
 Programm::Programm(QObject *parent) :
     QObject(parent){
@@ -30,6 +30,7 @@ Programm::~Programm(){
 
 bool Programm::checkProgramm(QString _Programm){
     ofstream file("savefile.txt");
+    emit newRunningProgramm(_Programm);
     file<< _Programm.toStdString();
     file.close();
     vector<QString> ProgrammVecTemp;
@@ -56,24 +57,38 @@ bool Programm::checkProgramm(QString _Programm){
     }
 }
 
+void Programm::connectProgramm(bool _loop){
+    if(errorList.size()==0){
+        for(unsigned long i=0;i<(programmVec.size()-1);i++){
+            connect(programmVec[i],SIGNAL(commandFinished()),programmVec[i+1],SLOT(exec()));
+        }
+        if(_loop){
+            connect(programmVec[programmVec.size()-1],SIGNAL(commandFinished()),programmVec[0],SLOT(exec()));
+            loop=_loop;
+        }
+        for(unsigned long i=0;i<programmVec.size();i++){
+            connect(programmVec[i],SIGNAL(commandStart(int)),this,SLOT(newRunningCommandSlot(int)));
+        }
+    }
+}
+
+void Programm::startProgramm(){
+    programmVec[0]->exec();
+
+}
 void Programm::stopJoints(){
-    for(int i=0;i<globalVaribles.doubleJointMotor.size();i++){
+    for(unsigned long i=0;i<globalVaribles.doubleJointMotor.size();i++){
         globalVaribles.doubleJointMotor[i]->running=false;
     }
-    for(int i=0;i<(programmVec.size()-1);i++){
+    for(unsigned long i=0;i<(programmVec.size()-1);i++){
         disconnect(programmVec[i],SIGNAL(commandFinished()),programmVec[i+1],SLOT(exec()));
     }
     disconnect(programmVec[programmVec.size()-1],SIGNAL(commandFinished()),programmVec[0],SLOT(exec()));
 }
-/*
-void Programm::setPos(vector<QString> Programm){
-    if(Programm.size()<3){
-       //printError("Error: Programm for Turn to short: Example  set J4 100",runningCommand);
-    }
-    else{
-        Joint *j;
-        j->setPosition(Programm[2].toInt());
-    }
-}*/
 
+
+void Programm::newRunningCommandSlot(int lineID){
+    runningCommand=lineID;
+    emit newRunningCommand(runningCommand);
+}
 

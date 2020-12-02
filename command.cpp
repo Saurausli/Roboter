@@ -99,6 +99,9 @@ void Command::exec(){
     vector<QString> commandVec;
     commandVec=split(command,' ');
     qDebug()<<"Command "<<programmLine;
+    if(function!=error){
+        emit commandStart(programmLine);
+    }
     switch (function) {
            case pause:
                 QTimer::singleShot(commandVec[1].toInt(), this, SLOT(commandFinishedSlot()));
@@ -108,9 +111,9 @@ void Command::exec(){
                 commandFinishedSlot();
                 break;
             case turn:
+                qDebug()<<"turn";
                 connect(joint,SIGNAL(commandFinished()),this,SLOT(commandFinishedSlot()));
                 joint->turnPosition(commandVec[2].toInt());
-
                 break;
             case tempo:
                 globalVariables->tempo=commandVec[1].toInt();

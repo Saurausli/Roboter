@@ -83,9 +83,11 @@ void Joint::positionChanged(int _joint, int _direction){
 
 void Joint::moveJoint(){
     if(target<position){
+
             dJM->move(position-target,joint,0);
     }
     else if(target>position){
+            qDebug()<<"turn Position";
             dJM->move(target-position,joint,1);
     }
     dJM->start();
