@@ -18,6 +18,10 @@
 
 #define PAUSE_SYNTAX "pause"
 
+#define LABLE_SYNTAX "label:"
+
+#define GOTO_SYNTAX "goto"
+
 #define DEF_DOUBLEMOTOR_SYNTAX "Doublemotor"
 
 #define DEF_JOINT_SYNTAX "Joint"
@@ -28,13 +32,20 @@ enum Function{
     set     =2,
     tempo   =3,
     pause   =4,
-    def     =5
+    label   =5,
+    gotoRobo     =5
+};
+
+struct Label{
+    unsigned int gotoLine;
+    QString labelName;
 };
 
 struct GlobalVariables{
     vector<Joint *> joints;
-    unsigned tempo;
+    unsigned int tempo;
     vector<DoubleJointMotor *> doubleJointMotor;
+    vector<Label *> lableVec;
 };
 
 using namespace std;
@@ -64,6 +75,7 @@ class Command:public QObject
         Function function;
         GlobalVariables *globalVariables;
         Joint *joint;
+        int getLable(QString name);
         void setJoint(QString name);
         void checkNumber(QString number);
         void checkLength(vector<QString> *com,unsigned long len);

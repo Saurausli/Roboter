@@ -79,7 +79,31 @@ void Command::checkCommand(){
                     throw er;
                 }
             }
+            else if(commandVec[0]==LABLE_SYNTAX){
+                try{
+                    function=Function::label;
+                    checkLength(&commandVec,2);
+                    Label l;
+                    l.gotoLine=programmLine;
+                    l.labelName=commandVec[1];
+                    globalVariables->lableVec.push_back(&l);
+                }
 
+                catch(Error *er){
+                    er->addToMessage("label");
+                    throw er;
+                }
+            }
+            else if(commandVec[0]==GOTO_SYNTAX){
+                try{
+                    function=Function::gotoRobo;
+                    checkLength(&commandVec,2);
+                }
+                catch(Error *er){
+                    er->addToMessage("goto");
+                    throw er;
+                }
+            }
 
             else {
                 throw (new Error(programmLine,"Syntax unkown",command));
@@ -120,6 +144,10 @@ void Command::exec(){
                 globalVariables->tempo=commandVec[1].toInt();
                 commandFinishedSlot();
                 break;
+            case tempo:
+                globalVariables->tempo=commandVec[1].toInt();
+                commandFinishedSlot();
+                break;
     }
 }
 /*else{
@@ -147,7 +175,14 @@ vector<QString> Command::split(QString _str, char delimiter) {
 
   return internal;
 }
-
+int Command::getLable(QString name){
+    for(int i=0;i< globalVariables->lableVec.size();i++){
+        if(globalVariables->lableVec[i]->labelName==name){
+            return globalVariables->lableVec[i]->gotoLine;
+        }
+    }
+    return -1
+}
 void Command::setJoint(QString name){
     for(unsigned long i=0;i<globalVariables->joints.size();i++){
         if(name==globalVariables->joints[i]->getName()){
