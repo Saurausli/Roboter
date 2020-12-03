@@ -104,6 +104,7 @@ void Command::exec(){
     }
     switch (function) {
            case pause:
+                qDebug()<<"pause";
                 QTimer::singleShot(commandVec[1].toInt(), this, SLOT(commandFinishedSlot()));
                 break;
             case set:
@@ -117,6 +118,7 @@ void Command::exec(){
                 break;
             case tempo:
                 globalVariables->tempo=commandVec[1].toInt();
+                commandFinishedSlot();
                 break;
     }
 }
@@ -180,6 +182,6 @@ void Command::commandFinishedSlot(){
                 disconnect(joint,SIGNAL(commandFinished()),this,SLOT(commandFinishedSlot()));
                 break;
     }
-    qDebug()<<"Finished";
+    //qDebug()<<"Finished";
     emit commandFinished();
 }

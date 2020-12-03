@@ -66,6 +66,9 @@ void Programm::connectProgramm(bool _loop){
             connect(programmVec[programmVec.size()-1],SIGNAL(commandFinished()),programmVec[0],SLOT(exec()));
             loop=_loop;
         }
+        else{
+            connect(programmVec[programmVec.size()-1],SIGNAL(commandFinished()),this,SLOT(ProgrammFinishedSlot()));
+        }
         for(unsigned long i=0;i<programmVec.size();i++){
             connect(programmVec[i],SIGNAL(commandStart(int)),this,SLOT(newRunningCommandSlot(int)));
         }
@@ -92,3 +95,6 @@ void Programm::newRunningCommandSlot(int lineID){
     emit newRunningCommand(runningCommand);
 }
 
+void Programm::ProgrammFinishedSlot(){
+    emit ProgrammFinished();
+}

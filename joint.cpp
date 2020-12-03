@@ -76,12 +76,10 @@ void Joint::positionChanged(int _joint, int _direction){
             dJM->running=false;
         }
     }
-    if(position==target){
-        emit commandFinished();
-    }
 }
 
 void Joint::moveJoint(){
+    connect(dJM,SIGNAL(commandFinished()),this,SLOT(turnFinished()));
     if(target<position){
 
             dJM->move(position-target,joint,0);
@@ -103,4 +101,9 @@ bool Joint::checkPosition(int _pos){
         return false;
     }
     return true;
+}
+
+void Joint::turnFinished(){
+    disconnect(dJM,SIGNAL(commandFinished()),this,SLOT(turnFinished()));
+    emit commandFinished();
 }

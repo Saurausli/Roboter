@@ -47,6 +47,7 @@ private:
 
 private slots:
     void newRunningCommandSlot(int lineID);
+    void ProgrammFinishedSlot();
 };
 
 #endif // Programm_H

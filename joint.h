@@ -39,6 +39,9 @@ private:
     bool doubleJointMotorEnable;
     DoubleJointMotor* dJM;
     unsigned joint;
+
+private slots:
+    void turnFinished();
 };
 
 #endif // JOINT_H
