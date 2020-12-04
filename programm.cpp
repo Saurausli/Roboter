@@ -71,6 +71,7 @@ void Programm::connectProgramm(bool _loop){
         }
         for(unsigned long i=0;i<programmVec.size();i++){
             connect(programmVec[i],SIGNAL(commandStart(int)),this,SLOT(newRunningCommandSlot(int)));
+            connect(programmVec[i],SIGNAL(gotoCommand(unsigned int)),this,SLOT(gotoSlot(unsigned int)));
         }
     }
 }
@@ -97,4 +98,16 @@ void Programm::newRunningCommandSlot(int lineID){
 
 void Programm::ProgrammFinishedSlot(){
     emit ProgrammFinished();
+}
+
+void Programm::gotoSlot(unsigned int line){
+    qDebug()<<"goto slot";
+    runningCommand=line;
+    for(unsigned long i=0;i<programmVec.size();i++){
+        if(programmVec[i]->getLine()==line){
+            programmVec[i]->exec();
+            return;
+        }
+    }
+
 }

@@ -33,7 +33,7 @@ enum Function{
     tempo   =3,
     pause   =4,
     label   =5,
-    gotoRobo     =5
+    gotoRobo     =6
 };
 
 struct Label{
@@ -61,7 +61,7 @@ class Command:public QObject
         ~Command();
         void checkCommand();
         Function getFunction();
-
+        unsigned int getLine();
         static vector<QString> split(QString _str, char delimiter);
     public slots:
         void exec();
@@ -69,6 +69,7 @@ class Command:public QObject
     signals:
         void commandStart(int line);
         void commandFinished();
+        void gotoCommand(unsigned int line);
     private:
         unsigned int programmLine;
         QString command;

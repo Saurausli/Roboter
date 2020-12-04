@@ -81,12 +81,13 @@ void Command::checkCommand(){
             }
             else if(commandVec[0]==LABLE_SYNTAX){
                 try{
-                    function=Function::label;
+
                     checkLength(&commandVec,2);
                     Label l;
                     l.gotoLine=programmLine;
                     l.labelName=commandVec[1];
                     globalVariables->lableVec.push_back(&l);
+                    function=Function::label;
                 }
 
                 catch(Error *er){
@@ -96,8 +97,9 @@ void Command::checkCommand(){
             }
             else if(commandVec[0]==GOTO_SYNTAX){
                 try{
-                    function=Function::gotoRobo;
                     checkLength(&commandVec,2);
+                    function=Function::gotoRobo;
+
                 }
                 catch(Error *er){
                     er->addToMessage("goto");
@@ -126,28 +128,50 @@ void Command::exec(){
     if(function!=error){
         emit commandStart(programmLine);
     }
-    switch (function) {
-           case pause:
-                qDebug()<<"pause";
-                QTimer::singleShot(commandVec[1].toInt(), this, SLOT(commandFinishedSlot()));
-                break;
-            case set:
-                joint->setPosition(commandVec[2].toInt());
-                commandFinishedSlot();
-                break;
-            case turn:
-                qDebug()<<"turn";
-                connect(joint,SIGNAL(commandFinished()),this,SLOT(commandFinishedSlot()));
-                joint->turnPosition(commandVec[2].toInt());
-                break;
-            case tempo:
-                globalVariables->tempo=commandVec[1].toInt();
-                commandFinishedSlot();
-                break;
-            case tempo:
-                globalVariables->tempo=commandVec[1].toInt();
-                commandFinishedSlot();
-                break;
+    try{
+        switch (function) {
+               case pause:
+                    qDebug()<<"pause";
+                    QTimer::singleShot(commandVec[1].toInt(), this, SLOT(commandFinishedSlot()));
+                    break;
+                case set:
+                    joint->setPosition(commandVec[2].toInt());
+                    commandFinishedSlot();
+                    break;
+                case turn:
+                    qDebug()<<"turn";
+                    connect(joint,SIGNAL(commandFinished()),this,SLOT(commandFinishedSlot()));
+                    joint->turnPosition(commandVec[2].toInt());
+                    break;
+                case tempo:
+                    globalVariables->tempo=commandVec[1].toInt();
+                    commandFinishedSlot();
+                    break;
+                case label:
+                    commandFinishedSlot();
+                    break;
+                case gotoRobo:
+                    unsigned int gotoline;
+                    gotoline=getLable(commandVec[1]);
+                    try{
+            qDebug()<<"goto try "<<gotoline;
+                        if(gotoline>-1){
+                            emit gotoCommand(gotoline);
+                        }
+                        else {
+                            throw (new Error(programmLine,"Label unkown",command));
+                        }
+                    }
+                    catch(Error *er){
+                        er->addToMessage("goto");
+                        throw er;
+                    }
+                    break;
+        }
+    }
+    catch(Error *er){
+        er->addToMessage("Execute");
+        throw er;
     }
 }
 /*else{
@@ -161,6 +185,9 @@ void Command::exec(){
 
 Function Command::getFunction(){
     return function;
+}
+unsigned int Command::getLine(){
+    return programmLine;
 }
 
 vector<QString> Command::split(QString _str, char delimiter) {
@@ -181,7 +208,7 @@ int Command::getLable(QString name){
             return globalVariables->lableVec[i]->gotoLine;
         }
     }
-    return -1
+    return -1;
 }
 void Command::setJoint(QString name){
     for(unsigned long i=0;i<globalVariables->joints.size();i++){
