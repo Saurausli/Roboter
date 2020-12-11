@@ -14,5 +14,5 @@ void Error::addToMessage(QString _message){
     message=_message+": "+message;
 }
 QString Error::getMessage(){
-    return "Line "+QString::number(line)+" Error: "+message+" "+command;
+    return "Line "+QString::number(line+1)+" Error: "+message+" "+command;
 }

@@ -49,6 +49,7 @@ private slots:
     void newRunningCommandSlot(int lineID);
     void ProgrammFinishedSlot();
     void gotoSlot(unsigned int line);
+    void commandError(Error er);
 };
 
 #endif // Programm_H

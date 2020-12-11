@@ -24,11 +24,9 @@ void DoubleJointMotor::move(int _steps,int _joint, int _direction){
     steps=_steps;
     joint=_joint;
     direction=_direction;
-    qDebug()<<"set steps "<<_steps;
 }
 void DoubleJointMotor::run(){
     QMutex mutex;
-    qDebug()<<"run";
     mutex.lock();
     running=true;
     mutex.unlock();
@@ -47,7 +45,6 @@ void DoubleJointMotor::run(){
             break;
         }
     }
-    qDebug()<<"Command finished";
     emit commandFinished();
     return;
 }

@@ -25,15 +25,33 @@
 #define DEF_DOUBLEMOTOR_SYNTAX "Doublemotor"
 
 #define DEF_JOINT_SYNTAX "Joint"
+
+#define DEF_LOOPSTART_SYNTAX "loopStart"
+
+#define DEF_LOOPEND "loopEnd"
+
+#define DEF_COMMENT_SYNTAX "//"
 enum Function{
-    error   =-1,
-    empty   =0,
-    turn    =1,
-    set     =2,
-    tempo   =3,
-    pause   =4,
-    label   =5,
-    gotoRobo     =6
+    error,
+    empty,
+    turn,
+    set,
+    tempo,
+    pause,
+    label,
+    gotoRobo,
+    loopStart,
+    loopEnd,
+    comment
+};
+
+struct Loop{
+    unsigned int startLine;
+    unsigned int endLine;
+    unsigned int loopCount=0;
+    unsigned int starLoopCount;
+    bool defined=false;
+    bool endlessLoop=false;
 };
 
 struct Label{
@@ -45,7 +63,8 @@ struct GlobalVariables{
     vector<Joint *> joints;
     unsigned int tempo;
     vector<DoubleJointMotor *> doubleJointMotor;
-    vector<Label *> lableVec;
+    vector<Label> lableVec;
+    vector<Loop> loopVec;
 };
 
 using namespace std;
@@ -70,15 +89,17 @@ class Command:public QObject
         void commandStart(int line);
         void commandFinished();
         void gotoCommand(unsigned int line);
+        void executeError(Error e);
     private:
         unsigned int programmLine;
         QString command;
         Function function;
         GlobalVariables *globalVariables;
         Joint *joint;
-        int getLable(QString name);
+        void getLable(QString name,unsigned int &_line);
         void setJoint(QString name);
         void checkNumber(QString number);
+        bool checkWordBeginnig(QString word,QString beginning);
         void checkLength(vector<QString> *com,unsigned long len);
     private slots:
         void commandFinishedSlot();
