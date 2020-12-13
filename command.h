@@ -18,17 +18,17 @@
 
 #define PAUSE_SYNTAX "pause"
 
-#define LABLE_SYNTAX "label:"
+#define LABLE_SYNTAX "label"
 
 #define GOTO_SYNTAX "goto"
+
+#define LOOPSTART_SYNTAX "loopStart"
+
+#define LOOPEND_SYNTAX "loopEnd"
 
 #define DEF_DOUBLEMOTOR_SYNTAX "Doublemotor"
 
 #define DEF_JOINT_SYNTAX "Joint"
-
-#define DEF_LOOPSTART_SYNTAX "loopStart"
-
-#define DEF_LOOPEND "loopEnd"
 
 #define DEF_COMMENT_SYNTAX "//"
 enum Function{
@@ -76,7 +76,7 @@ class Command:public QObject
 
     Q_OBJECT
     public:
-        explicit Command(GlobalVariables* _globalVariables,int _programmLine, QString _command, QObject *parent= nullptr);
+        explicit Command(GlobalVariables& _globalVariables,int _programmLine, QString _command, QObject *parent= nullptr);
         ~Command();
         void checkCommand();
         Function getFunction();
@@ -100,7 +100,7 @@ class Command:public QObject
         void setJoint(QString name);
         void checkNumber(QString number);
         bool checkWordBeginnig(QString word,QString beginning);
-        void checkLength(vector<QString> *com,unsigned long len);
+        void checkLength(vector<QString> &com,unsigned long len);
     private slots:
         void commandFinishedSlot();
 };

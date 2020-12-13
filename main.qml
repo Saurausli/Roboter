@@ -10,40 +10,65 @@ Window {
     Component.onCompleted: {
         textInput.editor.text=Backend.loadFile();
     }
-
-    Row{
-        id:buttonRow
-        anchors.margins:10
-        spacing: 10
+    color: "#333333"
+    Rectangle{
+        id:topRow
+        color: "#232323"
         anchors.top: parent.top
         anchors.left: parent.left
-        Button{
-            text: "try"
-            onClicked: {
-                    Backend.tryCommand(textInput.editor.text)
+        anchors.right: parent.right
+        height: 35+(buttonRow.anchors.margins*2)
+        Row{
+            id:buttonRow
+            anchors.fill: parent
+            anchors.margins:10
+            spacing: 10
+            Button{
+                id:tryButton
+                width: 40
+                text: "try"
+                focusPolicy: Qt.StrongFocus
+                anchors.bottom: parent.bottom
+                anchors.top: parent.top
+                background: Rectangle{color:"#dbdbdb"}
+                onClicked: {
+                        Backend.tryCommand(textInput.editor.text)
 
-                }
-        }
-        Button{
-            text: "stop"
-            onClicked: {
-                    Backend.stopJoints()
-                }
-        }
-        Button{
-            text: "loop"
-            onClicked: {
-                    stopButton.visible=true;
-                    Backend.loopCommand(textInput.editor.text)
+                    }
+            }
+            Button{
+                width: 40
+                text: "stop"
+                anchors.bottom: parent.bottom
+                anchors.top: parent.top
+                background: Rectangle{color:"#dbdbdb"}
+                onClicked: {
+                        Backend.stopJoints()
+                    }
+            }
+            Button{
+                width: 40
+                text: "loop"
+                anchors.bottom: parent.bottom
+                anchors.top: parent.top
+                background: Rectangle{color:"#dbdbdb"}
+                onClicked: {
+                        stopButton.visible=true;
+                        Backend.loopCommand(textInput.editor.text)
 
+                    }
+            }
+            Button{
+                id:stopButton
+                width: 70
+                visible: false
+                text: "stop Loop"
+                background: Rectangle{color:"#dbdbdb"}
+                anchors.top: parent.top
+                anchors.bottom: parent.bottom
+                onClicked: {
+                    Backend.stopLoop()
                 }
-        }
-        Button{
-            id:stopButton
-            visible: false
-            text: "stop Loop"
-            onClicked: {
-                Backend.stopLoop()
             }
         }
     }
@@ -54,7 +79,7 @@ Window {
         editor.text: ""
         editor.font.pixelSize: 15
         editor.focus: true
-        anchors.top: buttonRow.bottom
+        anchors.top: topRow.bottom
         anchors.bottom: respondsButtons.top
         anchors.left: parent.left
         anchors.right: parent.horizontalCenter
@@ -64,12 +89,12 @@ Window {
     Editor {
         id: runningCode
 
-        editor.text: ""
+        //editor.text: ""
         editor.font.pixelSize: 15
         focus: true
         editor.focus: false
         anchors.margins: 20
-        anchors.top: buttonRow.bottom
+        anchors.top: topRow.bottom
         anchors.bottom: respondsButtons.top
         anchors.right: parent.right
         anchors.left: parent.horizontalCenter
@@ -96,7 +121,8 @@ Window {
     }
     Text {
         id: textOutput
-        height: 250
+        height: 100
+        color: "#cce7e7"
         text: qsTr("")
         font.pixelSize: 15
         anchors.margins: 20
@@ -116,7 +142,8 @@ Window {
             }
         }
         onNewRunningProgramm:{
-            runningCode.editor.text=programm
+            runningCode.text=programm
+
         }
     }
 }

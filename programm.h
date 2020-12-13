@@ -40,7 +40,7 @@ public slots:
 protected:
     bool loop;
     ErrorList errorList;
-    GlobalVariables globalVaribles;
+    GlobalVariables *globalVaribles;
     int runningCommand;
     vector<Command*> programmVec;
 private:

@@ -55,3 +55,16 @@ QString ConsoleUi::loadFile(){
     buffer<<savefile.rdbuf();
     return QString::fromStdString(buffer.str());
 }
+
+QVector<QString> ConsoleUi::getFuncitionKeyWords(){
+   QVector<QString> vec;
+   vec.push_back(TURN_SYNTAX_NAME);
+   vec.push_back(SET_SYNTAX_NAME);
+   vec.push_back(TEMPO_SYNTAX);
+   vec.push_back(PAUSE_SYNTAX);
+   vec.push_back(LABLE_SYNTAX);
+   vec.push_back(GOTO_SYNTAX);
+   vec.push_back(LOOPEND_SYNTAX);
+   vec.push_back(LOOPSTART_SYNTAX);
+   return vec;
+}

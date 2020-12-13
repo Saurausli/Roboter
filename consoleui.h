@@ -23,7 +23,7 @@ public slots:
     QVector<int> getErrorLineVec();
     QVector<QString> getErrorMessageVec();
     QString loadFile();
-
+    QVector<QString> getFuncitionKeyWords();
 private:
     QQmlApplicationEngine *engine;
     QQmlContext* context;

@@ -1,13 +1,13 @@
 #include "command.h"
 
 
-Command::Command(GlobalVariables* _globalVariables,int _programmLine,
+Command::Command(GlobalVariables& _globalVariables,int _programmLine,
                  QString _command,QObject *parent):
     QObject(parent)
 {
     programmLine=_programmLine;
     command=_command;
-    globalVariables=_globalVariables;
+    globalVariables=&_globalVariables;
     checkCommand();
 
 }
@@ -20,6 +20,8 @@ void Command::checkCommand(){
 
         vector<QString> commandVec;
         commandVec=split(command,' ');
+        commandVec.erase(remove(commandVec.begin(),commandVec.end(),""),commandVec.end());
+        commandVec.shrink_to_fit();
         if(commandVec.size()>0){
             if(checkWordBeginnig(commandVec[0],DEF_COMMENT_SYNTAX)){
                 function=Function::comment;
@@ -28,7 +30,7 @@ void Command::checkCommand(){
             else if(commandVec[0]==TEMPO_SYNTAX){
                 try{
                     function=Function::tempo;
-                    checkLength(&commandVec,2);
+                    checkLength(commandVec,2);
                     checkNumber(commandVec[1]);
                 }
                 catch(Error *er){
@@ -39,7 +41,7 @@ void Command::checkCommand(){
             else if(commandVec[0]==TURN_SYNTAX_NAME){
                 try{
                     function=Function::turn;
-                    checkLength(&commandVec,3);
+                    checkLength(commandVec,3);
                     setJoint(commandVec[1]);
                     checkNumber(commandVec[2]);
                 }
@@ -51,7 +53,7 @@ void Command::checkCommand(){
             else if(commandVec[0]==PAUSE_SYNTAX){
                 try{
                     function=Function::pause;
-                    checkLength(&commandVec,2);
+                    checkLength(commandVec,2);
                     checkNumber(commandVec[1]);
                 }
                 catch(Error *er){
@@ -62,7 +64,7 @@ void Command::checkCommand(){
             else if(commandVec[0]==SET_SYNTAX_NAME){
                 try{
                     function=Function::set;
-                    checkLength(&commandVec,3);
+                    checkLength(commandVec,3);
                     setJoint(commandVec[1]);
                     checkNumber(commandVec[2]);
                 }
@@ -74,7 +76,7 @@ void Command::checkCommand(){
             else if(commandVec[0]==DEF_DOUBLEMOTOR_SYNTAX){
                 try{
                     function=Function::set;
-                    checkLength(&commandVec,3);
+                    checkLength(commandVec,3);
                     setJoint(commandVec[1]);
                     checkNumber(commandVec[2]);
                 }
@@ -86,7 +88,7 @@ void Command::checkCommand(){
             else if(commandVec[0]==LABLE_SYNTAX){
                 try{
 
-                    checkLength(&commandVec,2);
+                    checkLength(commandVec,2);
                     Label l;
                     l.gotoLine=programmLine;
                     l.labelName=commandVec[1];
@@ -101,7 +103,7 @@ void Command::checkCommand(){
             }
             else if(commandVec[0]==GOTO_SYNTAX){
                 try{
-                    checkLength(&commandVec,2);
+                    checkLength(commandVec,2);
                     function=Function::gotoRobo;
 
                 }
@@ -110,7 +112,7 @@ void Command::checkCommand(){
                     throw er;
                 }
             }
-            else if(commandVec[0]==DEF_LOOPSTART_SYNTAX){
+            else if(commandVec[0]==LOOPSTART_SYNTAX){
                 try{
 
                     Loop l;
@@ -120,34 +122,34 @@ void Command::checkCommand(){
 
                     }
                     else{
-                        checkLength(&commandVec,2);
-                        checkNumber(commandVec[2]);
-                        l.starLoopCount=commandVec[2].toInt();
+                        checkLength(commandVec,2);
+                        checkNumber(commandVec[1]);
+                        l.starLoopCount=commandVec[1].toInt();
                     }
                     function=Function::loopStart;
                     globalVariables->loopVec.push_back(l);
-
                 }
                 catch(Error *er){
                     er->addToMessage("loopStart");
                     throw er;
                 }
             }
-            else if(commandVec[0]==DEF_LOOPEND){
+            else if(commandVec[0]==LOOPEND_SYNTAX){
                 try{
-                    checkLength(&commandVec,1);
+                    checkLength(commandVec,1);
                     function=Function::loopEnd;
                     Loop *l;
                     bool found=false;
                     for(int i=globalVariables->loopVec.size();i>0;i--){
                         if(!globalVariables->loopVec[i-1].defined){
                            found=true;
+                           globalVariables->loopVec[i-1].defined=true;
                            globalVariables->loopVec[i-1].endLine=programmLine;
                            break;
                         }
                     }
                     if(!found){
-                        throw (new Error(programmLine,"Loop Start not found",command));
+                        throw (new Error(programmLine,"Loop start not found",command));
                     }
                 }
                 catch(Error *er){
@@ -165,13 +167,15 @@ void Command::checkCommand(){
         }
     }
     catch(Error *er){
-        er->addToMessage("Compile");
+        er->addToMessage("Compile ");
         throw er;
     }
 }
 void Command::exec(){
     vector<QString> commandVec;
     commandVec=split(command,' ');
+    commandVec.erase(remove(commandVec.begin(),commandVec.end(),""),commandVec.end());
+    commandVec.shrink_to_fit();
     if(function!=error){
         emit commandStart(programmLine);
     }
@@ -214,8 +218,13 @@ void Command::exec(){
                     for(unsigned i=0;i<globalVariables->loopVec.size();i++){
                         if(globalVariables->loopVec[i].endLine==programmLine){
                             if(globalVariables->loopVec[i].endlessLoop||globalVariables->loopVec[i].loopCount<globalVariables->loopVec[i].starLoopCount){
-                            emit gotoCommand(globalVariables->loopVec[i].startLine);
-                            break;}
+                                emit gotoCommand(globalVariables->loopVec[i].startLine);
+                                break;}
+                            else{
+                                globalVariables->loopVec[i].loopCount=0;
+                                commandFinishedSlot();
+                                break;
+                            }
                         }
                     }
                     break;
@@ -311,12 +320,12 @@ bool Command::checkWordBeginnig(QString word,QString beginning){
         return false;
 }
 
-void Command::checkLength(vector<QString> *com,unsigned long len){
-    if(com->size()>len){
-        throw(new Error(programmLine,"to many arguments",command));
+void Command::checkLength(vector<QString> &com,unsigned long len){
+    if(com.size()>len){
+        throw(new Error(programmLine,"to many arguments: found: "+QString::number(com.size())+" expected: "+QString::number(len),command));
     }
-    if(com->size()<len){
-        throw(new Error(programmLine,"to few arguments",command));
+    if(com.size()<len){
+        throw(new Error(programmLine,"to few arguments: found: "+QString::number(com.size())+" expected: "+QString::number(len),command));
     }
 }
 
@@ -326,6 +335,7 @@ void Command::commandFinishedSlot(){
                 disconnect(joint,SIGNAL(commandFinished()),this,SLOT(commandFinishedSlot()));
                 break;
     }
-    //qDebug()<<"Finished";
+    //qDebug()<<programmLine<<" Finished";
+
     emit commandFinished();
 }
