@@ -123,8 +123,13 @@ Flickable {
                     color: "#e58076"
                     text:{
                         var t
-                        t= errorMessage[index].substring(errorMessage[index].indexOf("Error:")+7)
-                        t= t.substring(0,t.indexOf(";"))
+                        if(errorMessage.length>index){
+                            t= errorMessage[index].substring(errorMessage[index].indexOf("Error:")+7)
+                            t= t.substring(0,t.indexOf(";"))
+                        }
+                        else{
+                            return ""
+                        }
                     }
                  }
              }
@@ -175,7 +180,7 @@ Flickable {
     function displayColorText(){
         var keyword=[];
         keyword=Backend.getFuncitionKeyWords()
-        //te.textFormat=TextEdit.PlainText
+        te.textFormat=TextEdit.PlainText
         te.text=text
         te.text=" "+te.text+" "
         for(var i=0;i<keyword.length;i++){
