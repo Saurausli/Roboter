@@ -157,6 +157,21 @@ void Command::checkCommand(){
                     throw er;
                 }
             }
+            else if(commandVec[0]==DEF_DOUBLEMOTOR_SYNTAX){
+                try{
+                    function=Function::definition;
+                    checkLength(commandVec,5);
+                    checkNumber(commandVec[2]);
+                    checkNumber(commandVec[3]);
+                    checkNumber(commandVec[4]);
+                    checkNumber(commandVec[5]);
+                    checkNewDefineName(commandVec[1]);
+                }
+                catch(Error *er){
+                    er->addToMessage("set");
+                    throw er;
+                }
+            }
             else {
                 throw (new Error(programmLine,"Syntax unkown",command));
             }
@@ -300,7 +315,18 @@ void Command::setJoint(QString name){
     Error *er=new Error(programmLine,"Joint '"+ name+"' not defined",command);
     throw er;
 }
-
+void Command::checkNewDefineName(QString name){
+    for(unsigned long i=0;i<globalVariables->joints.size();i++){
+        if(name==globalVariables->joints[i]->getName()){
+            throw(new Error(programmLine,"Variable Name already exist",command));
+        }
+    }
+    for(unsigned long i=0;i<globalVariables->doubleJointMotor.size();i++){
+        if(name==globalVariables->doubleJointMotor[i]->getName()){
+            throw(new Error(programmLine,"Variable Name already exist",command));
+        }
+    }
+}
 void Command::checkNumber(QString number){
     bool ok;
     number.toInt(&ok,10);

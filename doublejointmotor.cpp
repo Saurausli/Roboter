@@ -1,6 +1,6 @@
 #include "doublejointmotor.h"
 
-DoubleJointMotor::DoubleJointMotor(int _m1_Step,int _m1_Dir, int _m2_Step,int _m2_Dir,unsigned *_tempo,QObject *parent):
+DoubleJointMotor::DoubleJointMotor(QString _name,int _m1_Step,int _m1_Dir, int _m2_Step,int _m2_Dir,unsigned *_tempo,QObject *parent):
     QThread (parent)
 {
     m1_Step=_m1_Step;
@@ -25,6 +25,7 @@ void DoubleJointMotor::move(int _steps,int _joint, int _direction){
     joint=_joint;
     direction=_direction;
 }
+
 void DoubleJointMotor::run(){
     QMutex mutex;
     mutex.lock();
@@ -48,6 +49,11 @@ void DoubleJointMotor::run(){
     emit commandFinished();
     return;
 }
+
+QString DoubleJointMotor::getName(){
+    return name;
+}
+
 void DoubleJointMotor::step(){
     emit executedStep(joint, direction);
 #ifdef RASPBERRYPI
