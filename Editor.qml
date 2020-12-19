@@ -17,7 +17,7 @@ Flickable {
      property string text: ""
      onTextChanged: {
          if(live){
-                displayColorText()
+                //displayColorText()
              }
 
          }
@@ -202,7 +202,7 @@ Flickable {
             }
         }
         te.text=te.text.replace(/\n/g,"<br>")
-        te.text=te.text.substring(1);
+        //te.text=te.text.substring(1);
         te.textFormat=TextEdit.RichText
 
     }
