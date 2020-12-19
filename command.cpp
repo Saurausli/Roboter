@@ -77,8 +77,10 @@ void Command::checkCommand(){
                 try{
                     function=Function::set;
                     checkLength(commandVec,3);
-                    setJoint(commandVec[1]);
                     checkNumber(commandVec[2]);
+
+                    Joint j
+                    setJoint(commandVec[1]);
                 }
                 catch(Error *er){
                     er->addToMessage("doublemotor definition");
@@ -154,21 +156,6 @@ void Command::checkCommand(){
                 }
                 catch(Error *er){
                     er->addToMessage("loopEnd");
-                    throw er;
-                }
-            }
-            else if(commandVec[0]==DEF_DOUBLEMOTOR_SYNTAX){
-                try{
-                    function=Function::definition;
-                    checkLength(commandVec,5);
-                    checkNumber(commandVec[2]);
-                    checkNumber(commandVec[3]);
-                    checkNumber(commandVec[4]);
-                    checkNumber(commandVec[5]);
-                    checkNewDefineName(commandVec[1]);
-                }
-                catch(Error *er){
-                    er->addToMessage("set");
                     throw er;
                 }
             }
@@ -253,14 +240,7 @@ void Command::exec(){
                     catch(Error *er){
                         er->addToMessage("goto");
                         throw er;
-                        break;
                     }
-                    break;
-
-
-
-
-
         }
     }
     catch(Error *er){
@@ -315,18 +295,7 @@ void Command::setJoint(QString name){
     Error *er=new Error(programmLine,"Joint '"+ name+"' not defined",command);
     throw er;
 }
-void Command::checkNewDefineName(QString name){
-    for(unsigned long i=0;i<globalVariables->joints.size();i++){
-        if(name==globalVariables->joints[i]->getName()){
-            throw(new Error(programmLine,"Variable Name already exist",command));
-        }
-    }
-    for(unsigned long i=0;i<globalVariables->doubleJointMotor.size();i++){
-        if(name==globalVariables->doubleJointMotor[i]->getName()){
-            throw(new Error(programmLine,"Variable Name already exist",command));
-        }
-    }
-}
+
 void Command::checkNumber(QString number){
     bool ok;
     number.toInt(&ok,10);
@@ -353,6 +322,14 @@ void Command::checkLength(vector<QString> &com,unsigned long len){
     if(com.size()<len){
         throw(new Error(programmLine,"to few arguments: found: "+QString::number(com.size())+" expected: "+QString::number(len),command));
     }
+}
+void Command::checkMotor(QString name, bool &doubleMotor){
+    for(unsigned long i=0;i<globalVariables->doubleJointMotor.size();i++){
+        if(name==globalVariables->doubleJointMotor[i]->getName()){
+            joint= globalVariables->doubleJointMotor[i];
+            return;
+        }
+    }}
 }
 
 void Command::commandFinishedSlot(){
