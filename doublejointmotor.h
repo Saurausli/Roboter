@@ -17,12 +17,13 @@ class DoubleJointMotor: public QThread
 {
     Q_OBJECT
 public:
-    explicit DoubleJointMotor(int _m1_Step,int _m1_Dir, int _m2_Step,int _m2_Dir,unsigned* _tempo, QObject *parent = nullptr);
+    explicit DoubleJointMotor(QString _name, int _m1_Step,int _m1_Dir, int _m2_Step,int _m2_Dir,unsigned* _tempo, QObject *parent = nullptr);
     ~DoubleJointMotor();
     void move(int _steps,int _joint, int _direction);
 
     void run();
     bool running;
+    QString getName();
 signals:
     void commandFinished();
     void executedStep(int _joint, int _direction);
@@ -34,6 +35,7 @@ private:
     int joint;
     int steps;
     int direction;
+    QString name;
     unsigned *tempo;
     void step();
 };

@@ -31,6 +31,7 @@
 #define DEF_JOINT_SYNTAX "Joint"
 
 #define DEF_COMMENT_SYNTAX "//"
+
 enum Function{
     error,
     empty,
@@ -42,7 +43,8 @@ enum Function{
     gotoRobo,
     loopStart,
     loopEnd,
-    comment
+    comment,
+    definition
 };
 
 struct Loop{
@@ -98,9 +100,11 @@ class Command:public QObject
         Joint *joint;
         void getLable(QString name,unsigned int &_line);
         void setJoint(QString name);
+        void checkNewDefineName(QString name);
         void checkNumber(QString number);
         bool checkWordBeginnig(QString word,QString beginning);
         void checkLength(vector<QString> &com,unsigned long len);
+
     private slots:
         void commandFinishedSlot();
 };

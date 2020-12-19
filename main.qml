@@ -129,7 +129,6 @@ Window {
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: parent.right
-
     }
     Connections{
         target: Backend
