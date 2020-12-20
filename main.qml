@@ -1,5 +1,5 @@
 import QtQuick 2.10
-import QtQuick.Controls 2.4
+import QtQuick.Controls 2.10
 import QtQuick.Window 2.10
 Window {
     id:window
@@ -32,7 +32,7 @@ Window {
                 anchors.top: parent.top
                 background: Rectangle{color:"#dbdbdb"}
                 onClicked: {
-                        Backend.tryCommand(textInput.editor.text)
+                        Backend.tryCommand(textInput.getText())
 
                     }
             }
@@ -54,7 +54,7 @@ Window {
                 background: Rectangle{color:"#dbdbdb"}
                 onClicked: {
                         stopButton.visible=true;
-                        Backend.loopCommand(textInput.editor.text)
+                        Backend.loopCommand(textInput.getText())
 
                     }
             }
@@ -142,7 +142,6 @@ Window {
         }
         onNewRunningProgramm:{
             runningCode.text=programm
-
         }
     }
 }

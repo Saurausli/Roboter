@@ -42,6 +42,7 @@ enum Function{
     gotoRobo,
     loopStart,
     loopEnd,
+    define,
     comment
 };
 
@@ -100,7 +101,19 @@ class Command:public QObject
         void setJoint(QString name);
         void checkNumber(QString number);
         bool checkWordBeginnig(QString word,QString beginning);
+
         void checkLength(vector<QString> &com,unsigned long len);
+        void checkMinLength(vector<QString> &com,unsigned long len);
+        void checkMaxLength(vector<QString> &com,unsigned long len);
+        void checkMinMaxLength(vector<QString> &com,unsigned long min,unsigned long max);
+
+        void checkValueMin(int value, int min);
+        void checkValueMax(int value, int max);
+        void checkValueMinMax(int value, int min, int max);
+        void checkDefineName(QString name);
+
+        int findDoubleMotor(QString name);
+        int findJoint(QString name);
         void checkMotor(QString name, bool &doubleMotor);
     private slots:
         void commandFinishedSlot();

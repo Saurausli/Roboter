@@ -75,15 +75,47 @@ void Command::checkCommand(){
             }
             else if(commandVec[0]==DEF_DOUBLEMOTOR_SYNTAX){
                 try{
-                    function=Function::set;
-                    checkLength(commandVec,3);
+                    function=Function::define;
+                    checkLength(commandVec,6);
                     checkNumber(commandVec[2]);
-
-                    Joint j
-                    setJoint(commandVec[1]);
+                    checkNumber(commandVec[3]);
+                    checkNumber(commandVec[4]);
+                    checkNumber(commandVec[5]);
+                    globalVariables->doubleJointMotor.push_back(new DoubleJointMotor(commandVec[1],commandVec[2].toInt(),commandVec[3].toInt()
+                                                                ,commandVec[4].toInt(),commandVec[5].toInt(),&globalVariables->tempo));
                 }
                 catch(Error *er){
                     er->addToMessage("doublemotor definition");
+                    throw er;
+                }
+            }
+            else if(commandVec[0]==DEF_JOINT_SYNTAX){
+                try{
+                    function=Function::define;
+                    bool doubleMotor;
+                    int pinBegin=0;
+                    checkMinLength(commandVec,6);
+                    checkMotor(commandVec[2],doubleMotor);
+                    if(doubleMotor){
+                       checkLength(commandVec,6);
+                       pinBegin=1;
+                    }
+                    else{
+                        checkLength(commandVec,5);
+                    }
+                    checkNumber(commandVec[3+pinBegin]);
+                    checkNumber(commandVec[4+pinBegin]);
+                    globalVariables->joints.push_back(new Joint(commandVec[1],commandVec[3+pinBegin].toInt(),commandVec[4+pinBegin].toInt()));
+                    if(doubleMotor){
+                        checkNumber(commandVec[3]);
+                        checkValueMinMax(commandVec[3].toInt(),0,1);
+                        globalVariables->joints[globalVariables->joints.size()-1]->setDoubleJointMotor(globalVariables->doubleJointMotor[findDoubleMotor(commandVec[2])],
+                                commandVec[3].toInt());
+
+                    }
+                }
+                catch(Error *er){
+                    er->addToMessage("joint definition");
                     throw er;
                 }
             }
@@ -183,31 +215,22 @@ void Command::exec(){
     }
     try{
         switch (function) {
-               case pause:
+               case pause:{
                     QTimer::singleShot(commandVec[1].toInt(), this, SLOT(commandFinishedSlot()));
-                    break;
-                case set:
+                    break;}
+                case set:{
                     joint->setPosition(commandVec[2].toInt());
                     commandFinishedSlot();
-                    break;
-                case turn:
+            break;}
+                case turn:{
                     connect(joint,SIGNAL(commandFinished()),this,SLOT(commandFinishedSlot()));
                     joint->turnPosition(commandVec[2].toInt());
-                    break;
-                case tempo:
+                    break;}
+                case tempo:{
                     globalVariables->tempo=commandVec[1].toInt();
                     commandFinishedSlot();
-                    break;
-                case comment:
-                    commandFinishedSlot();
-                    break;
-                case empty:
-                    commandFinishedSlot();
-                    break;
-                case label:
-                    commandFinishedSlot();
-                    break;
-                case loopStart:
+                    break;}
+                case loopStart:{
                     for(unsigned i=0;i<globalVariables->loopVec.size();i++){
                         if(globalVariables->loopVec[i].endlessLoop||globalVariables->loopVec[i].startLine==programmLine){
                             globalVariables->loopVec[i].loopCount++;
@@ -215,8 +238,8 @@ void Command::exec(){
                             break;
                         }
                     }
-                    break;
-                case loopEnd:
+                    break;}
+                case loopEnd:{
                     for(unsigned i=0;i<globalVariables->loopVec.size();i++){
                         if(globalVariables->loopVec[i].endLine==programmLine){
                             if(globalVariables->loopVec[i].endlessLoop||globalVariables->loopVec[i].loopCount<globalVariables->loopVec[i].starLoopCount){
@@ -229,18 +252,22 @@ void Command::exec(){
                             }
                         }
                     }
-                    break;
-                case gotoRobo:
+                    break;}
+                case gotoRobo:{
                     unsigned int gotoline=0;
                     try{
                         getLable(commandVec[1],gotoline);
                         emit gotoCommand(gotoline);
-                        break;
-                    }
+                        break;}
                     catch(Error *er){
                         er->addToMessage("goto");
                         throw er;
                     }
+                }
+                default:{
+                    commandFinishedSlot();
+                    break;
+                }
         }
     }
     catch(Error *er){
@@ -316,20 +343,70 @@ bool Command::checkWordBeginnig(QString word,QString beginning){
 }
 
 void Command::checkLength(vector<QString> &com,unsigned long len){
-    if(com.size()>len){
-        throw(new Error(programmLine,"to many arguments: found: "+QString::number(com.size())+" expected: "+QString::number(len),command));
-    }
+    checkMinLength(com,len);
+    checkMaxLength(com,len);
+}
+
+void Command::checkMinLength(vector<QString> &com,unsigned long len){
     if(com.size()<len){
-        throw(new Error(programmLine,"to few arguments: found: "+QString::number(com.size())+" expected: "+QString::number(len),command));
+        throw(new Error(programmLine,"to few arguments: found: "+QString::number(com.size())+" minimum: "+QString::number(len),command));
     }
 }
-void Command::checkMotor(QString name, bool &doubleMotor){
+void Command::checkMaxLength(vector<QString> &com,unsigned long len){
+    if(com.size()>len){
+        throw(new Error(programmLine,"to many arguments: found: "+QString::number(com.size())+" maximum: "+QString::number(len),command));
+    }
+}
+void Command::checkMinMaxLength(vector<QString> &com,unsigned long min,unsigned long max){
+    checkMinLength(com,min);
+    checkMaxLength(com,max);
+}
+void Command::checkValueMin(int value, int min){
+    if(value<min){
+        throw(new Error(programmLine,"value to low : found:"+QString::number(value)+" minimum: "+QString::number(min),command));
+    }
+}
+
+void Command::checkValueMax(int value, int max){
+    if(value>max){
+        throw(new Error(programmLine,"value to high : found:"+QString::number(value)+" maximum: "+QString::number(max),command));
+    }
+}
+void Command::checkValueMinMax(int value, int min, int max){
+    checkValueMin(value,min);
+    checkValueMax(value,max);
+}
+void Command::checkDefineName(QString name){
+    if(findDoubleMotor(name)>-1||findJoint(name)>-1){
+        throw(new Error(programmLine,"redefinition of \'"+name+"\' ",command));
+    }
+}
+
+int Command::findDoubleMotor(QString name){
     for(unsigned long i=0;i<globalVariables->doubleJointMotor.size();i++){
         if(name==globalVariables->doubleJointMotor[i]->getName()){
-            joint= globalVariables->doubleJointMotor[i];
+            return i;
+        }
+    }
+    return -1;
+}
+int Command::findJoint(QString name){
+    for(unsigned long i=0;i<globalVariables->joints.size();i++){
+        if(name==globalVariables->joints[i]->getName()){
+            return i;
+        }
+    }
+    return -1;
+}
+void Command::checkMotor(QString name, bool &doubleMotor){
+    doubleMotor=false;
+    for(unsigned long i=0;i<globalVariables->doubleJointMotor.size();i++){
+        if(name==globalVariables->doubleJointMotor[i]->getName()){
+            doubleMotor=true;
             return;
         }
-    }}
+    }
+    throw(new Error(programmLine,name+" Motor not defined",command));
 }
 
 void Command::commandFinishedSlot(){

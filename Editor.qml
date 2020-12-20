@@ -1,5 +1,7 @@
 import QtQuick 2.10
-import QtQuick.Controls 2.12
+
+import QtQuick.Controls 2.13
+//import QtQml 2.13
 
 Flickable {
      id: editor
@@ -15,9 +17,12 @@ Flickable {
      property variant errorLine: []
      property variant errorMessage: []
      property string text: ""
+     property string textProv
      onTextChanged: {
          if(live){
-                //displayColorText()
+                te.text=text
+                displayColorText()
+
              }
 
          }
@@ -145,16 +150,23 @@ Flickable {
              wrapMode: TextEdit.Wrap
              selectByKeyboard:true
              selectByMouse: true
+             textFormat:TextEdit.RichText
              onSelectedTextChanged: {
-                 console.debug(selectedText)
+                // console.debug(selectedText)
              }
-
+             onEditingFinished: {
+                 displayColorText();
+             }
              selectedTextColor: "#bec0c2"
              selectionColor: "#1d545c"
              mouseSelectionMode: TextEdit.SelectCharacters
              readOnly : live
              onCursorRectangleChanged: editor.ensureVisible(cursorRectangle)
              persistentSelection: true
+             /*Timer {
+                     interval: 500; running:true; repeat: true
+                     onTriggered: displayColorText()
+                 }*/
          }
          Text{
              id: num
@@ -176,51 +188,70 @@ Flickable {
              }
          }
      }
+    function getText(){
+        var temp
+        temp=te.getText(0,te.length)
+        //console.debug(temp.charCodeAt(0))
+        console.debug(temp)
+        var replaceStringTemp=String.fromCharCode(8233)
+        var search=new RegExp(replaceStringTemp, "g")
+        temp=temp.replace(search,"\n")
+        replaceStringTemp=String.fromCharCode(8232)
+        search=new RegExp(replaceStringTemp, "g")
+        temp=temp.replace(search,"\n")
+        console.debug(temp)
+        return temp
+    }
 
     function displayColorText(){
-        var keyword=[];
-        keyword=Backend.getFuncitionKeyWords()
-        te.textFormat=TextEdit.PlainText
-        te.text=text
-        te.text=" "+te.text+" "
-        for(var i=0;i<keyword.length;i++){
-            replaceString(keyword[i],"<font color=\"#45c6d6\">")
-        }
-        //te.text=te.text.replace(/\n/g,"<br>")
+        var cursorPositionProv
+        cursorPositionProv=te.cursorPosition
+        textProv=getText()
+        textProv=" "+textProv
+        colorWord(Backend.getFuncitionKeyWords(),"#45c6d6")
+        colorWord(Backend.getVariableTypWords(),"#ff8080")
         var search=new RegExp("//", "g")
-        te.text=te.text.replace(search,"<font color=\"#a8abb0\">//")
+        textProv=textProv.replace(search,"<font color=\"#a8abb0\">//")
 
         var charIndex=0;
-        charIndex =te.text.indexOf("//",charIndex);
+        charIndex =textProv.indexOf("//",charIndex);
         while(charIndex>-1){
-            charIndex =te.text.indexOf("//",charIndex);
+            charIndex =textProv.indexOf("//",charIndex);
 
-            var endIndex=te.text.indexOf("\n",charIndex)
+            var endIndex=textProv.indexOf("\n",charIndex)
             if(endIndex<0){
-                endIndex=te.text.length-1
+                endIndex=textProv.length
             }
 
 
             if(charIndex>-1){
-                te.text= te.text.substring(0,endIndex)+"</font>"+te.text.substring(endIndex)
+                textProv= textProv.substring(0,endIndex)+"</font>"+textProv.substring(endIndex)
                 charIndex=endIndex+6;
             }
         }
-        te.text=te.text.replace(/\n/g,"<br>")
-        //te.text=te.text.substring(1);
-        te.textFormat=TextEdit.RichText
+        textProv=textProv.replace(/\n/g,"<br>")
 
+        textProv=textProv.substring(1);
+        console.debug(textProv)
+        te.text=textProv
+        te.cursorPosition=cursorPositionProv
+    }
+
+    function colorWord(keyword,color){
+        for(var i=0;i<keyword.length;i++){
+            replaceString(keyword[i],"<font color=\""+color+"\">")
+        }
     }
 
     function replaceString(word,fontStartText){
         var search=new RegExp("\n"+word+"\n", "g")
-        te.text=te.text.replace(search,"\n"+fontStartText+word+"</font>\n")
+        textProv=textProv.replace(search,"\n"+fontStartText+word+"</font>\n")
         search=new RegExp("\n"+word+" ", "g")
-        te.text=te.text.replace(search,"\n"+fontStartText+word+"</font> ")
+        textProv=textProv.replace(search,"\n"+fontStartText+word+"</font> ")
         search=new RegExp(" "+word+"\n", "g")
-        te.text=te.text.replace(search," "+fontStartText+word+"</font>\n")
+        textProv=textProv.replace(search," "+fontStartText+word+"</font>\n")
         search=new RegExp(" "+word+" ", "g")
-        te.text=te.text.replace(search," "+fontStartText+word+"</font> ")
+        textProv=textProv.replace(search," "+fontStartText+word+"</font> ")
     }
 
      function ensureVisible(r)

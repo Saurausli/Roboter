@@ -15,13 +15,18 @@ Programm::~Programm(){
 
 
 bool Programm::checkProgramm(QString _Programm){
+    /*
+     Doublemotor M1M2 22 23 24 25
+     Joint J1 M1M2 0 3680 -3680
+     Joint J2 M1M2 1 4000 -4000
+     */
     globalVaribles= new GlobalVariables;
-    DoubleJointMotor *dJ=new DoubleJointMotor(22,23,24,25,&globalVaribles->tempo);
+    /*DoubleJointMotor *dJ=new DoubleJointMotor("hallo",22,23,24,25,&globalVaribles->tempo);
     globalVaribles->doubleJointMotor.push_back(dJ);
     globalVaribles->joints.push_back(new Joint("J1",3680,-3680));
     globalVaribles->joints[globalVaribles->joints.size()-1]->setDoubleJointMotor(globalVaribles->doubleJointMotor[0],0);
     globalVaribles->joints.push_back(new Joint("J2",4000,-4000));
-    globalVaribles->joints[globalVaribles->joints.size()-1]->setDoubleJointMotor(globalVaribles->doubleJointMotor[0],1);
+    globalVaribles->joints[globalVaribles->joints.size()-1]->setDoubleJointMotor(globalVaribles->doubleJointMotor[0],1);*/
     globalVaribles->tempo=100;
 
     //connect(this,SIGNAL(ProgrammFinished()),this,SLOT(nextProgramm()));

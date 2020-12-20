@@ -1,3 +1,5 @@
+
+
 #include "consoleui.h"
 
 ConsoleUi::ConsoleUi(QObject *parent) :
@@ -67,4 +69,11 @@ QVector<QString> ConsoleUi::getFuncitionKeyWords(){
    vec.push_back(LOOPEND_SYNTAX);
    vec.push_back(LOOPSTART_SYNTAX);
    return vec;
+}
+
+QVector<QString> ConsoleUi::getVariableTypWords(){
+    QVector<QString> vec;
+    vec.push_back(DEF_DOUBLEMOTOR_SYNTAX);
+    vec.push_back(DEF_JOINT_SYNTAX);
+    return vec;
 }

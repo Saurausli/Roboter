@@ -8,6 +8,7 @@ DoubleJointMotor::DoubleJointMotor(QString _name,int _m1_Step,int _m1_Dir, int _
     m2_Step=_m2_Step;
     m2_Dir=_m2_Dir;
     tempo=_tempo;
+    name=_name;
 #ifdef RASPBERRYPI
 
     pinMode(m1_Step,OUTPUT);

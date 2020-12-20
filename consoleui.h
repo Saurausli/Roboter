@@ -24,6 +24,7 @@ public slots:
     QVector<QString> getErrorMessageVec();
     QString loadFile();
     QVector<QString> getFuncitionKeyWords();
+    QVector<QString> getVariableTypWords();
 private:
     QQmlApplicationEngine *engine;
     QQmlContext* context;
