@@ -88,7 +88,7 @@ Window {
         anchors.margins: 20
         live:false
     }
-    /*Editor {
+    Editor {
         id: runningCode
 
         //editor.text: ""
@@ -101,7 +101,7 @@ Window {
         anchors.right: parent.right
         anchors.left: parent.horizontalCenter
         live: true
-    }*/
+    }
     Row{
         id:respondsButtons
         anchors.margins:5
@@ -143,8 +143,8 @@ Window {
             }
         }
         onNewRunningProgramm:{
-            /*runningCode.setText(programm)
-            runningCode.displayColorText()*/
+            runningCode.setText(programm)
+            runningCode.displayColorText()
         }
     }
 }

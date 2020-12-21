@@ -149,20 +149,11 @@ Flickable {
              selectByMouse: true
              textFormat:TextEdit.RichText
              property int lengthPrevious: 0
-             /*onLengthChanged: {
+             onLengthChanged: {
                  if(length!=lengthPrevious){
-                     console.debug(length,lengthPrevious);
                      lengthPrevious=length;
                      displayColorText();
-
-                     console.debug(length,lengthPrevious);
                  }
-
-                 //displayColorText();
-             }*/
-
-             onSelectedTextChanged: {
-                // console.debug(selectedText)
              }
              onEditingFinished: {
                  displayColorText();
@@ -172,11 +163,6 @@ Flickable {
              mouseSelectionMode: TextEdit.SelectCharacters
              readOnly : live
              onCursorRectangleChanged: editor.ensureVisible(cursorRectangle)
-             //persistentSelection: true
-             /*Timer {
-                     interval: 500; running:true; repeat: true
-                     onTriggered: displayColorText()
-                 }*/
          }
          Text{
              id: num
@@ -237,11 +223,12 @@ Flickable {
                 if(endIndex<0){
                     endIndex=textProv.length
                 }
-                textProv=textProv.substring(0,charIndex)+"<font color=\"#a8abb0\">"+textProv.substring(charIndex,endIndex)+"</font>"+textProv.substring(endIndex)
+
+                textProv=textProv.substring(0,charIndex)+"<font color=\"#a8abb0\">"+deleteHtml(textProv.substring(charIndex,endIndex))+"</font>"+textProv.substring(endIndex)
                 endIndex=textProv.indexOf("\n",charIndex)
                 charIndex=endIndex
             }
-            //textProv=deleteHtml(textProv,charIndex,endIndex)
+
         }
         textProv=textProv.substring(1);
         setText(textProv)
@@ -263,38 +250,21 @@ Flickable {
         search=new RegExp(" "+word+" ", "g")
         textProv=textProv.replace(search," "+fontStartText+word+"</font> ")
     }
-    function deleteHtml(stringProv,start,end){/*
-        if(start>-1&&end>-1){
-            var substringTemp=stringProv.substring(start,end)
-            var startString=stringProv.substring(0,start)
-            var endString=stringProv.substring(end)
-
-
-            console.debug("-------------",start,end)
-            console.debug(stringProv)
-            console.debug(substringTemp)
-            var search=new RegExp("</font>", "g")
-            substringTemp=substringTemp.replace(search,"")
-            var startIndex=0
-            var endIndex=0
-            while(startIndex>-1&&endIndex>-1&&endIndex<substringTemp.length){
-                startIndex=substringTemp.indexOf("<font",startIndex)
-                endIndex=substringTemp.indexOf(">",startIndex)+1
-                //console.debug("-------------")
-                //console.debug(substringTemp)
-                //console.debug("index:",startIndex,endIndex)
-                substringTemp=substringTemp.substring(0,startIndex)+substringTemp.substring(endIndex)
-                console.debug(substringTemp)
+    function deleteHtml(stringProv){
+        var charIndex=0
+        var search=new RegExp("</font>", "g")
+        stringProv=stringProv.replace(search,"")
+        while(charIndex>-1){
+            charIndex=stringProv.indexOf("<font",0)
+            if(charIndex>-1){
+                var charEnd
+                charEnd=stringProv.indexOf(">",charIndex)
+                if(charEnd>-1){
+                    stringProv=stringProv.replace(stringProv.substring(charIndex,charEnd+1),"")
+                }
             }
-            stringProv=startString+"<font color=\"#a8abb0\">"+substringTemp+"</font>"+endString
-            //console.debug(stringProv)
-            console.debug(startString)
-            console.debug(substringTemp)
-            console.debug(endString)
-            console.debug("-------------")
-            console.debug(stringProv)
         }
-        return stringProv*/
+        return stringProv
     }
      function ensureVisible(r)
      {
