@@ -148,6 +148,19 @@ Flickable {
              selectByKeyboard:true
              selectByMouse: true
              textFormat:TextEdit.RichText
+             property int lengthPrevious: 0
+             /*onLengthChanged: {
+                 if(length!=lengthPrevious){
+                     console.debug(length,lengthPrevious);
+                     lengthPrevious=length;
+                     displayColorText();
+
+                     console.debug(length,lengthPrevious);
+                 }
+
+                 //displayColorText();
+             }*/
+
              onSelectedTextChanged: {
                 // console.debug(selectedText)
              }
@@ -159,7 +172,7 @@ Flickable {
              mouseSelectionMode: TextEdit.SelectCharacters
              readOnly : live
              onCursorRectangleChanged: editor.ensureVisible(cursorRectangle)
-             persistentSelection: true
+             //persistentSelection: true
              /*Timer {
                      interval: 500; running:true; repeat: true
                      onTriggered: displayColorText()
@@ -187,8 +200,7 @@ Flickable {
      }
     function getText(){
         var temp
-        temp=te.getText(0,te.length)
-        //console.debug(temp.charCodeAt(0))
+        temp=te.getText(0,300)
         var replaceStringTemp=String.fromCharCode(8233)
         var search=new RegExp(replaceStringTemp, "g")
         temp=temp.replace(search,"\n")
@@ -198,10 +210,11 @@ Flickable {
         return temp
     }
     function setText(string){
+        string="<pre>"+string+"</pre>"
         var cursorPos
         cursorPos=te.cursorPosition
-        console.debug("cursor Pos: "+cursorPos)
-        string=string.replace(/\n/g,"<br>")
+        var replaceStringTemp=String.fromCharCode(8233)
+        string=string.replace(/\n/g,replaceStringTemp)
         te.text=string
         te.cursorPosition=cursorPos
     }
@@ -211,25 +224,24 @@ Flickable {
         textProv=" "+textProv
         colorWord(Backend.getFuncitionKeyWords(),"#45c6d6")
         colorWord(Backend.getVariableTypWords(),"#ff8080")
-        var search=new RegExp("//", "g")
+   /*     var search=new RegExp("//", "g")
         textProv=textProv.replace(search,"<font color=\"#a8abb0\">//")
-
+*/
         var charIndex=0;
-        charIndex =textProv.indexOf("//",charIndex);
-        while(charIndex>-1){
+        var endIndex=0;
+
+            while(charIndex>-1){
             charIndex =textProv.indexOf("//",charIndex);
-
-            var endIndex=textProv.indexOf("\n",charIndex)
-            textProv=deleteHtml(textProv,charIndex,endIndex)
-            if(endIndex<0){
-                endIndex=textProv.length
+            if(charIndex>=0){
+                endIndex=textProv.indexOf("\n",charIndex+2)
+                if(endIndex<0){
+                    endIndex=textProv.length
+                }
+                textProv=textProv.substring(0,charIndex)+"<font color=\"#a8abb0\">"+textProv.substring(charIndex,endIndex)+"</font>"+textProv.substring(endIndex)
+                endIndex=textProv.indexOf("\n",charIndex)
+                charIndex=endIndex
             }
-
-
-            if(charIndex>-1){
-                textProv= textProv.substring(0,endIndex)+"</font>"+textProv.substring(endIndex)
-                charIndex=endIndex+6;
-            }
+            //textProv=deleteHtml(textProv,charIndex,endIndex)
         }
         textProv=textProv.substring(1);
         setText(textProv)
@@ -251,19 +263,38 @@ Flickable {
         search=new RegExp(" "+word+" ", "g")
         textProv=textProv.replace(search," "+fontStartText+word+"</font> ")
     }
-    function deleteHtml(string,start,end){
-        var startIndex=0
-        var endIndex=0
-        //var search=new RegExp("</font>", "g")
-        //textProv=textProv.replace(search,"\n"+"",start,end)
-        while(startIndex>-1&&endIndex>-1&&endIndex<end){
-            console.debug(string)
-            startIndex=textProv.indexOf("<font",start)
-            endIndex=textProv.indexOf(">",startIndex)
-            string=string.substring(startIndex)+string.substring(endIndex)
-            console.debug(startIndex,endIndex,string)
+    function deleteHtml(stringProv,start,end){/*
+        if(start>-1&&end>-1){
+            var substringTemp=stringProv.substring(start,end)
+            var startString=stringProv.substring(0,start)
+            var endString=stringProv.substring(end)
+
+
+            console.debug("-------------",start,end)
+            console.debug(stringProv)
+            console.debug(substringTemp)
+            var search=new RegExp("</font>", "g")
+            substringTemp=substringTemp.replace(search,"")
+            var startIndex=0
+            var endIndex=0
+            while(startIndex>-1&&endIndex>-1&&endIndex<substringTemp.length){
+                startIndex=substringTemp.indexOf("<font",startIndex)
+                endIndex=substringTemp.indexOf(">",startIndex)+1
+                //console.debug("-------------")
+                //console.debug(substringTemp)
+                //console.debug("index:",startIndex,endIndex)
+                substringTemp=substringTemp.substring(0,startIndex)+substringTemp.substring(endIndex)
+                console.debug(substringTemp)
+            }
+            stringProv=startString+"<font color=\"#a8abb0\">"+substringTemp+"</font>"+endString
+            //console.debug(stringProv)
+            console.debug(startString)
+            console.debug(substringTemp)
+            console.debug(endString)
+            console.debug("-------------")
+            console.debug(stringProv)
         }
-        return string
+        return stringProv*/
     }
      function ensureVisible(r)
      {
