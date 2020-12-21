@@ -8,7 +8,9 @@ Window {
     visible: true
     title: qsTr("Console")
     Component.onCompleted: {
-        textInput.editor.text=Backend.loadFile();
+        textInput.setText(Backend.loadFile())
+        textInput.displayColorText()
+
     }
     color: "#333333"
     Rectangle{
@@ -91,7 +93,7 @@ Window {
 
         //editor.text: ""
         editor.font.pixelSize: 15
-        focus: true
+        //focus: true
         editor.focus: false
         anchors.margins: 20
         anchors.top: topRow.bottom
@@ -141,7 +143,8 @@ Window {
             }
         }
         onNewRunningProgramm:{
-            runningCode.text=programm
+            runningCode.setText(programm)
+            runningCode.displayColorText()
         }
     }
 }

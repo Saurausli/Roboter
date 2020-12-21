@@ -20,11 +20,8 @@ Flickable {
      property string textProv
      onTextChanged: {
          if(live){
-                te.text=text
                 displayColorText()
-
              }
-
          }
 
      Connections{
@@ -192,20 +189,24 @@ Flickable {
         var temp
         temp=te.getText(0,te.length)
         //console.debug(temp.charCodeAt(0))
-        console.debug(temp)
         var replaceStringTemp=String.fromCharCode(8233)
         var search=new RegExp(replaceStringTemp, "g")
         temp=temp.replace(search,"\n")
         replaceStringTemp=String.fromCharCode(8232)
         search=new RegExp(replaceStringTemp, "g")
         temp=temp.replace(search,"\n")
-        console.debug(temp)
         return temp
+    }
+    function setText(string){
+        var cursorPos
+        cursorPos=te.cursorPosition
+        console.debug("cursor Pos: "+cursorPos)
+        string=string.replace(/\n/g,"<br>")
+        te.text=string
+        te.cursorPosition=cursorPos
     }
 
     function displayColorText(){
-        var cursorPositionProv
-        cursorPositionProv=te.cursorPosition
         textProv=getText()
         textProv=" "+textProv
         colorWord(Backend.getFuncitionKeyWords(),"#45c6d6")
@@ -219,6 +220,7 @@ Flickable {
             charIndex =textProv.indexOf("//",charIndex);
 
             var endIndex=textProv.indexOf("\n",charIndex)
+            textProv=deleteHtml(textProv,charIndex,endIndex)
             if(endIndex<0){
                 endIndex=textProv.length
             }
@@ -229,12 +231,8 @@ Flickable {
                 charIndex=endIndex+6;
             }
         }
-        textProv=textProv.replace(/\n/g,"<br>")
-
         textProv=textProv.substring(1);
-        console.debug(textProv)
-        te.text=textProv
-        te.cursorPosition=cursorPositionProv
+        setText(textProv)
     }
 
     function colorWord(keyword,color){
@@ -253,7 +251,20 @@ Flickable {
         search=new RegExp(" "+word+" ", "g")
         textProv=textProv.replace(search," "+fontStartText+word+"</font> ")
     }
-
+    function deleteHtml(string,start,end){
+        var startIndex=0
+        var endIndex=0
+        //var search=new RegExp("</font>", "g")
+        //textProv=textProv.replace(search,"\n"+"",start,end)
+        while(startIndex>-1&&endIndex>-1&&endIndex<end){
+            console.debug(string)
+            startIndex=textProv.indexOf("<font",start)
+            endIndex=textProv.indexOf(">",startIndex)
+            string=string.substring(startIndex)+string.substring(endIndex)
+            console.debug(startIndex,endIndex,string)
+        }
+        return string
+    }
      function ensureVisible(r)
      {
          if (contentX >= r.x)
