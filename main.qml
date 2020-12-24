@@ -78,9 +78,8 @@ Window {
     Editor {
         id: textInput
 
-        editor.text: ""
-        editor.font.pixelSize: 15
-        editor.focus: true
+        //text: ""
+
         anchors.top: topRow.bottom
         anchors.bottom: respondsButtons.top
         anchors.left: parent.left
@@ -92,9 +91,7 @@ Window {
         id: runningCode
 
         //editor.text: ""
-        editor.font.pixelSize: 15
         //focus: true
-        editor.focus: false
         anchors.margins: 20
         anchors.top: topRow.bottom
         anchors.bottom: respondsButtons.top

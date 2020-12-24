@@ -12,7 +12,7 @@ Flickable {
      clip: true
 
      property bool live: false
-     property alias editor: te
+     //property alias editor: te
      property int liveCommand: -1
      property variant errorLine: []
      property variant errorMessage: []
@@ -23,7 +23,9 @@ Flickable {
                 displayColorText()
              }
          }
-
+    Component.onCompleted: {
+        te.focus=!live
+    }
      Connections{
          target: Backend
          onNewRunningCommand:{
@@ -61,15 +63,6 @@ Flickable {
          height: te.implicitHeight<editor.height ? editor.height: te.implicitHeight
          width: editor.width
          color: "#2e2f30"
-         onHeightChanged: {
-             num.text="1"
-             for(var i=2;i<=height/fontMetrics.height;i++){
-                 num.text=num.text+'\n'+i
-             }
-         }
-
-
-
         Rectangle{
             anchors.left: root.left
             anchors.top: root.top
@@ -78,10 +71,7 @@ Flickable {
             color: "#404244"
 
         }
-         FontMetrics {
-             id: fontMetrics
-             font: te.font
-         }
+
 
          /*Rectangle {
              x: 0; y: te.cursorRectangle.y
@@ -136,6 +126,42 @@ Flickable {
                  }
              }
          }
+         MouseArea{
+                      anchors.fill: parent
+                      onClicked: {
+                          if(!te.focus){
+                          te.focus=true
+                          }
+                      }
+                  }
+         Text{
+             id: num
+             anchors.left: parent.left
+             anchors.top: parent.top
+             anchors.leftMargin: 10
+             renderType: Text.NativeRendering
+             textFormat:TextEdit.RichText
+             font.pointSize : 16
+
+             color: "#bec0c2"
+             wrapMode: Text.WordWrap
+             text: "1"
+             Connections{
+                 target: te
+                 onLineCountChanged:{
+                     var a="1"
+                     for(var i=2;i<=te.lineCount;i++){
+                         a=a+"<br>"+i
+                     }
+                     num.text="<\pre>"+a+"<\pre>"
+                 }
+             }
+
+         }
+         FontMetrics {
+             id: fontMetrics
+             font: te.font
+         }
          TextEdit {
              id: te
              anchors.leftMargin: 10
@@ -144,9 +170,10 @@ Flickable {
              color:"#d6cf9a"
              anchors.top: parent.top
              renderType: Text.NativeRendering
-             wrapMode: TextEdit.Wrap
-             selectByKeyboard:true
-             selectByMouse: true
+
+             wrapMode: Text.WordWrap
+             selectByMouse :true
+             font.pointSize : 16
              textFormat:TextEdit.RichText
              property int lengthPrevious: 0
              onLengthChanged: {
@@ -163,26 +190,33 @@ Flickable {
              mouseSelectionMode: TextEdit.SelectCharacters
              readOnly : live
              onCursorRectangleChanged: editor.ensureVisible(cursorRectangle)
-         }
-         Text{
-             id: num
-             anchors.left: parent.left
-             anchors.top: parent.top
-             anchors.leftMargin: 10
-             font: te.font
-             text: "0"
-             color: "#bec0c2"
+             MouseArea{
+                 anchors.fill: parent
+                 property int startIndex
+                 hoverEnabled: true
+                 onClicked: {
+                     //console.debug("Clicked")
+                     te.cursorPosition=te.positionAt(mouse.x,mouse.y)
+                     startIndex=te.cursorPosition
+                     te.focus=true
 
-         }
-
-         MouseArea{
-             anchors.fill: parent
-             onClicked: {
-                 if(!te.focus){
-                 te.focus=true
+                 }
+                 onReleased:{
+                     var endIndex
+                    endIndex=te.positionAt(mouse.x,mouse.y)
+                     console.debug(startIndex,endIndex)
+                    if(startIndex<endIndex){
+                        te.select(startIndex,endIndex)
+                    }
+                    else if(startIndex>endIndex){
+                        te.select(endIndex,startIndex)
+                    }
+                    te.selectAll()
                  }
              }
          }
+
+
      }
     function getText(){
         var temp
@@ -202,6 +236,7 @@ Flickable {
         var replaceStringTemp=String.fromCharCode(8233)
         string=string.replace(/\n/g,replaceStringTemp)
         te.text=string
+        //console.debug(te.text)
         te.cursorPosition=cursorPos
     }
 
