@@ -9,16 +9,18 @@ Window {
     title: qsTr("Console")
     Row{
         id:buttonRow
-        anchors.margins:10
-        spacing: 10
         anchors.top: parent.top
         anchors.left: parent.left
+        anchors.right: parent.right
+
+        anchors.margins:10
+        spacing: 10
         Button{
             text: "try"
             onClicked: {
-                    Backend.tryCommand(textInput.editor.text)
+                    Backend.tryCommand(textInput.getText())
 
-                }
+            }
         }
         Button{
             text: "stop"
@@ -31,7 +33,6 @@ Window {
             onClicked: {
                     stopButton.visible=true;
                     Backend.loopCommand(textInput.editor.text)
-
                 }
         }
         Button{
@@ -43,33 +44,15 @@ Window {
             }
         }
     }
-
     Editor {
         id: textInput
-
-        editor.text: ""
-        editor.font.pixelSize: 15
-        editor.focus: true
         anchors.top: buttonRow.bottom
         anchors.bottom: respondsButtons.top
         anchors.left: parent.left
-        anchors.right: parent.horizontalCenter
-        anchors.margins: 20
-        live:false
-    }
-    Editor {
-        id: runningCode
-
-        editor.text: ""
-        editor.font.pixelSize: 15
-        focus: true
-        editor.focus: false
-        anchors.margins: 20
-        anchors.top: buttonRow.bottom
-        anchors.bottom: respondsButtons.top
         anchors.right: parent.right
-        anchors.left: parent.horizontalCenter
-        live: true
+        anchors.margins: 20
+        //focus: true
+
     }
     Row{
         id:respondsButtons
@@ -92,7 +75,7 @@ Window {
     }
     Text {
         id: textOutput
-        height: 250
+        height: 150
         text: qsTr("")
         font.pixelSize: 15
         anchors.margins: 20
