@@ -7,6 +7,9 @@ Window {
     height:600
     visible: true
     title: qsTr("Console")
+    Component.onCompleted: {
+        textInput.setText(Backend.loadFile());
+    }
     Row{
         id:buttonRow
         anchors.top: parent.top
@@ -18,7 +21,7 @@ Window {
         Button{
             text: "try"
             onClicked: {
-                    Backend.tryCommand(textInput.getText())
+                    Backend.tryCommand(textInput.getProgramm())
 
             }
         }

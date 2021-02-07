@@ -35,11 +35,7 @@ Rectangle{
         id:sideNum
         contentHeight: sideNumRec.height
         contentWidth: sideNumRec.width
-        contentY: textflick.contentY//+textflick.anchors.margins
-        onContentYChanged: {
-            console.debug(textflick.contentY,textflick.anchors.margins,contentY)
-        }
-
+        contentY: textflick.contentY
         width: sideNumRec.width
         anchors.top: background.top
         anchors.bottom: background.bottom
@@ -48,7 +44,11 @@ Rectangle{
         clip: true
         Rectangle{
             id:sideNumRec
-            width:num.width+10+num.anchors.leftMargin
+            width:(0.8125*num.font.pointSize*(' '+(textEditInput.lineCount)).length)+10+num.anchors.leftMargin
+            onWidthChanged: {
+                console.debug("num",width,(' '+(textEditInput.lineCount)).length,0.8125*num.font.pointSize)
+            }
+
             height: textEditInput.height+(textflick.anchors.margins*2)
             clip: true
             color: "#404244"
@@ -82,11 +82,14 @@ Rectangle{
 
                 color: "#bec0c2"
                 function updateLineCount(){
-                        text=" 1 "
+                    textFormat=TextEdit.PlainText
+                    text="<pre> 1 "
                     for(var i=2;i<=textEditInput.lineCount;i++){
                             text=text+"<br> "+i+" "
                         }
+                    text=text+"</pre>"
                     updateColorNum()
+                    textFormat=TextEdit.RichText
                 }
                 function updateColorNum(){
                     var search=new RegExp("<b><font color=\"#d6c540\">", "g")
@@ -135,7 +138,6 @@ Rectangle{
             property int lengthPrevious: 0
             property int cursorLine: (cursorRectangle.y+fontMetrics.height)/fontMetrics.height
             onCursorLineChanged: {
-                console.debug("cursor ",cursorLine)
                 ensureVisible(cursorRectangle)
             }
 
@@ -150,10 +152,17 @@ Rectangle{
             selectionColor: "#1d545c"
             onCursorRectangleChanged: ensureVisible(cursorRectangle)
             textFormat:TextEdit.RichText
+            property int prevLinCount: 0
             onLengthChanged: {
-                if(length!=lengthPrevious){
+                if(!lockBar&&length!=lengthPrevious){
                     lengthPrevious=length;
-                    displayColorText();
+                    if(lineCount-prevLinCount>1){
+                        for(var i=cursorLine-1;i>lineCount-prevLinCount;i--){
+                            displayColorLine(i);
+                        }
+                    }
+                    prevLinCount=lineCount
+                    displayColorLine(cursorLine);
                 }
             }
             Menu {
@@ -213,10 +222,15 @@ Rectangle{
             }
         }
     }
-    function getText(){
+    function getProgramm(){
+        return getText(0,textEditInput.length)
+    }
+
+    function getText(start,end){
         //console.debug("get text")
         var temp
-        temp=textEditInput.getText(0,300)
+
+        temp=textEditInput.getText(start,end)
         var replaceStringTemp=String.fromCharCode(8233)
         var search=new RegExp(replaceStringTemp, "g")
         temp=temp.replace(search,"\n")
@@ -227,26 +241,55 @@ Rectangle{
     }
     function setText(string){
         lockBar=true
-        string="<pre>"+string+"</pre>"
         var cursorPos
         cursorPos=textEditInput.cursorPosition
-        var replaceStringTemp=String.fromCharCode(8233)
-        string=string.replace(/\n/g,replaceStringTemp)
+        //string="<pre>"+string+"</pre>"
+        string=toRichText(string)
         textEditInput.text=string
-        //console.debug(textEditInput.text)
         textEditInput.cursorPosition=cursorPos
         lockBar=false
+        displayColorTextAll()
         ensureVisible(textEditInput.cursorRectangle)
+    }
+    function toRichText(string){
+        var replaceStringTemp=String.fromCharCode(8233)
+        string=string.replace(/\n/g,replaceStringTemp)//Replace plain \n with html "\n"
+        return string
+    }
+
+    function replaceLine(newString,start,end){
+        lockBar=true
+        var cursorPos
+        cursorPos=textEditInput.cursorPosition
+        newString=toRichText(newString)
+        textEditInput.remove(start,end)
+        //console.debug(start,newString)
+        textEditInput.insert(start,newString)
+        textEditInput.cursorPosition=cursorPos
+        lockBar=false
+    }
+
+    function displayColorTextAll(){
+        for(var i=0;i<textEditInput.lineCount;i++){
+            displayColorLine(i)
+        }
+    }
+
+    function displayColorLine(line){
+        var start;
+        var end;
+        start=textEditInput.positionAt(0,line*fontMetrics.height+(fontMetrics.height/2))
+        end=textEditInput.positionAt(textEditInput.width,line*fontMetrics.height+(fontMetrics.height/2))
+        textProv=getText(start,end)
+        displayColorText()
+        replaceLine(textProv,start,end)
+        //console.debug(textEditInput.text)
     }
 
     function displayColorText(){
-        textProv=getText()
         textProv=" "+textProv
         colorWord(Backend.getFuncitionKeyWords(),"#45c6d6")
         colorWord(Backend.getVariableTypWords(),"#ff8080")
-   /*     var search=new RegExp("//", "g")
-        textProv=textProv.replace(search,"<font color=\"#a8abb0\">//")
-*/
         var charIndex=0;
         var endIndex=0;
 
@@ -265,7 +308,6 @@ Rectangle{
 
         }
         textProv=textProv.substring(1);
-        setText(textProv)
     }
 
     function colorWord(keyword,color){
@@ -315,7 +357,9 @@ Rectangle{
             else if(textEditInput.cursorLine<firstVisibleLine){
                 textflick.contentY=(textEditInput.cursorLine-1)*fontMetrics.height
             }
+
             if(re.x>textflick.width+textflick.contentX){
+                console.debug(re.x,textflick.width,textflick.contentX)
                 textflick.contentX=(re.x-textflick.width)+10
             }
             else if(re.x<textflick.contentX){
