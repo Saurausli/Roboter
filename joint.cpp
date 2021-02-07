@@ -1,10 +1,11 @@
 #include "joint.h"
 
-Joint::Joint(int _max, int _min,QObject *parent):
+Joint::Joint(QString _name,int _max, int _min,QObject *parent):
     QThread (parent)
 {
     setMax(_max);
     setMin(_min);
+    name=_name;
     position=0;
 }
 
@@ -46,6 +47,10 @@ void Joint::turnPosition(int _steps){
 
 }
 
+QString Joint::getName(){
+    return name;
+}
+
 void Joint::setMax(int _max){
     max=_max;
 }
@@ -74,7 +79,9 @@ void Joint::positionChanged(int _joint, int _direction){
 }
 
 void Joint::moveJoint(){
+    connect(dJM,SIGNAL(commandFinished()),this,SLOT(turnFinished()));
     if(target<position){
+
             dJM->move(position-target,joint,0);
     }
     else if(target>position){
@@ -93,4 +100,9 @@ bool Joint::checkPosition(int _pos){
         return false;
     }
     return true;
+}
+
+void Joint::turnFinished(){
+    disconnect(dJM,SIGNAL(commandFinished()),this,SLOT(turnFinished()));
+    emit commandFinished();
 }

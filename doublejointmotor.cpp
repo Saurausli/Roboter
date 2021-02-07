@@ -1,6 +1,6 @@
 #include "doublejointmotor.h"
 
-DoubleJointMotor::DoubleJointMotor(int _m1_Step,int _m1_Dir, int _m2_Step,int _m2_Dir,unsigned *_tempo,QObject *parent):
+DoubleJointMotor::DoubleJointMotor(QString _name,int _m1_Step,int _m1_Dir, int _m2_Step,int _m2_Dir,unsigned *_tempo,QObject *parent):
     QThread (parent)
 {
     m1_Step=_m1_Step;
@@ -8,6 +8,7 @@ DoubleJointMotor::DoubleJointMotor(int _m1_Step,int _m1_Dir, int _m2_Step,int _m
     m2_Step=_m2_Step;
     m2_Dir=_m2_Dir;
     tempo=_tempo;
+    name=_name;
 #ifdef RASPBERRYPI
 
     pinMode(m1_Step,OUTPUT);
@@ -25,17 +26,20 @@ void DoubleJointMotor::move(int _steps,int _joint, int _direction){
     joint=_joint;
     direction=_direction;
 }
+
 void DoubleJointMotor::run(){
     QMutex mutex;
     mutex.lock();
     running=true;
     mutex.unlock();
-    for(int i=0;i<steps;i++){
+    while(0<steps){
         QMutex mutex;
         mutex.lock();
+        //qDebug()<<steps;
         if(running){
             mutex.unlock();
             step();
+            steps--;
         }
         else{
             mutex.unlock();
@@ -43,9 +47,14 @@ void DoubleJointMotor::run(){
             break;
         }
     }
-
     emit commandFinished();
+    return;
 }
+
+QString DoubleJointMotor::getName(){
+    return name;
+}
+
 void DoubleJointMotor::step(){
     emit executedStep(joint, direction);
 #ifdef RASPBERRYPI
@@ -77,6 +86,7 @@ void DoubleJointMotor::step(){
         digitalWrite(m2_Step,HIGH);
 #endif
         usleep(unsigned((*tempo)));
+
         #ifdef RASPBERRYPI
         digitalWrite(m1_Step,LOW);
         digitalWrite(m2_Step,LOW);

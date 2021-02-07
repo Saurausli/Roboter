@@ -10,7 +10,7 @@ class Joint: public QThread
 {
     Q_OBJECT
 public:
-    explicit Joint(int _max, int _min,QObject *parent = nullptr);
+    explicit Joint(QString _name,int _max, int _min,QObject *parent = nullptr);
     ~Joint();
     void run();
     void setDoubleJointMotor(DoubleJointMotor *_dJM,unsigned _joint);
@@ -22,9 +22,10 @@ public:
     void setMin(int _min);
     bool setPosition(int _pos);
     void turnPosition(int _steps);
-
+    QString getName();
 signals:  
     void commandFinished();
+
 private slots:
     void positionChanged(int _joint, int _direction);
 private:
@@ -34,9 +35,13 @@ private:
     int target;
     int max;
     int min;
+    QString name;
     bool doubleJointMotorEnable;
     DoubleJointMotor* dJM;
     unsigned joint;
+
+private slots:
+    void turnFinished();
 };
 
 #endif // JOINT_H

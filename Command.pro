@@ -3,7 +3,7 @@ CONFIG += c++11
 TEMPLATE = app
 
 #DEFINES += RASPBERRYPI
-DEFINES += QT_DEPRECATED_WARNINGS
+#DEFINES += QT_DEPRECATED_WARNINGS
 #LIBS += -L/usr/local/lib -lwiringPi
 #INCLUDEPATH += /usr/local/include
 
@@ -11,14 +11,18 @@ SOURCES += \
         command.cpp \
         consoleui.cpp \
         doublejointmotor.cpp \
+        error.cpp \
         joint.cpp \
-        main.cpp
+        main.cpp \
+        programm.cpp
 
 HEADERS += \
     command.h \
     consoleui.h \
     doublejointmotor.h \
-    joint.h
+    error.h \
+    joint.h \
+    programm.h
 
 RESOURCES += \
     Ressourcen.qrc

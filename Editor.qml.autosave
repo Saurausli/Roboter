@@ -35,11 +35,7 @@ Rectangle{
         id:sideNum
         contentHeight: sideNumRec.height
         contentWidth: sideNumRec.width
-        contentY: textflick.contentY//+textflick.anchors.margins
-        onContentYChanged: {
-            console.debug(textflick.contentY,textflick.anchors.margins,contentY)
-        }
-
+        contentY: textflick.contentY
         width: sideNumRec.width
         anchors.top: background.top
         anchors.bottom: background.bottom
@@ -238,8 +234,7 @@ Rectangle{
         lockBar=false
         ensureVisible(textEditInput.cursorRectangle)
     }
-
-    function displayColorText(){
+    function displayColorTextAll(){
         textProv=getText()
         textProv=" "+textProv
         colorWord(Backend.getFuncitionKeyWords(),"#45c6d6")
@@ -266,6 +261,14 @@ Rectangle{
         }
         textProv=textProv.substring(1);
         setText(textProv)
+    }
+
+    function displayColorTextQuick(){
+        
+    }
+
+    function displayColorText(){
+        displayColorTextAll()
     }
 
     function colorWord(keyword,color){
