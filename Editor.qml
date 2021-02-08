@@ -45,10 +45,6 @@ Rectangle{
         Rectangle{
             id:sideNumRec
             width:(0.8125*num.font.pointSize*(' '+(textEditInput.lineCount)).length)+10+num.anchors.leftMargin
-            onWidthChanged: {
-                console.debug("num",width,(' '+(textEditInput.lineCount)).length,0.8125*num.font.pointSize)
-            }
-
             height: textEditInput.height+(textflick.anchors.margins*2)
             clip: true
             color: "#404244"
@@ -56,7 +52,7 @@ Rectangle{
                 id:num
                 textFormat:TextEdit.RichText
                 renderType: Text.NativeRendering
-                text:""
+                text:" 1 "
                 Component.onCompleted: {
                     num.updateLineCount()
                 }
@@ -81,27 +77,45 @@ Rectangle{
                 anchors.bottom: parent.bottom
 
                 color: "#bec0c2"
+                property int prevLinCount: 1
                 function updateLineCount(){
-                    textFormat=TextEdit.PlainText
+                    removeColor()
+                    if(prevLinCount>textEditInput.lineCount){
+                        for(var j=prevLinCount;j>textEditInput.lineCount;j--){
+                           text= text.replace(" "+j-1+" <br> "+j+" "," "+j-1+" ")
+                        }
+                    }
+                    else if(prevLinCount<textEditInput.lineCount){
+                        for(j=prevLinCount;j<textEditInput.lineCount;j++){
+                           text= text.replace(" "+j+" "," "+j+" <br> "+(j+1)+" ")
+                        }
+                    }
+                    prevLinCount=textEditInput.lineCount
+                    updateColorNum()
+                    /*textFormat=TextEdit.PlainText
                     text="<pre> 1 "
                     for(var i=2;i<=textEditInput.lineCount;i++){
                             text=text+"<br> "+i+" "
                         }
                     text=text+"</pre>"
                     updateColorNum()
-                    textFormat=TextEdit.RichText
+                    textFormat=TextEdit.RichText*/
                 }
                 function updateColorNum(){
+                    removeColor()
+                    var search=new RegExp(" "+textEditInput.cursorLine+" ", "g")
+                    text=text.replace(search," <b><font color=\"#d6c540\">"+textEditInput.cursorLine+"</font> ")
+                }
+                function removeColor(){
                     var search=new RegExp("<b><font color=\"#d6c540\">", "g")
                     text=text.replace(search,"")
                     search=new RegExp("</font>", "g")
                     text=text.replace(search,"")
-                    search=new RegExp(" "+textEditInput.cursorLine+" ", "g")
-                    text=text.replace(search," <b><font color=\"#d6c540\">"+textEditInput.cursorLine+"</font> ")
                 }
             }
         }
     }
+
     Flickable{
         id:textflick
         contentHeight: textEditInput.height
@@ -134,7 +148,7 @@ Rectangle{
         TextEdit{
             id:textEditInput
             clip:true
-            renderType: Text.NativeRendering
+            //renderType: Text.NativeRendering
             property int lengthPrevious: 0
             property int cursorLine: (cursorRectangle.y+fontMetrics.height)/fontMetrics.height
             onCursorLineChanged: {
@@ -158,6 +172,7 @@ Rectangle{
                     lengthPrevious=length;
                     if(lineCount-prevLinCount>1){
                         for(var i=cursorLine-1;i>lineCount-prevLinCount;i--){
+
                             displayColorLine(i);
                         }
                     }
@@ -241,15 +256,16 @@ Rectangle{
     }
     function setText(string){
         lockBar=true
+        //string="<pre>"+string+"</pre>"
         var cursorPos
         cursorPos=textEditInput.cursorPosition
-        //string="<pre>"+string+"</pre>"
         string=toRichText(string)
         textEditInput.text=string
         textEditInput.cursorPosition=cursorPos
         lockBar=false
         displayColorTextAll()
         ensureVisible(textEditInput.cursorRectangle)
+
     }
     function toRichText(string){
         var replaceStringTemp=String.fromCharCode(8233)
@@ -261,25 +277,26 @@ Rectangle{
         lockBar=true
         var cursorPos
         cursorPos=textEditInput.cursorPosition
-        newString=toRichText(newString)
+        //newString=toRichText(newString)
         textEditInput.remove(start,end)
-        //console.debug(start,newString)
-        textEditInput.insert(start,newString)
+        textEditInput.insert(start,"<pre>"+newString+"</pre>")
         textEditInput.cursorPosition=cursorPos
         lockBar=false
+        console.debug(textEditInput.text)
     }
 
     function displayColorTextAll(){
-        for(var i=0;i<textEditInput.lineCount;i++){
+        for(var i=1;i<=textEditInput.lineCount;i++){
             displayColorLine(i)
         }
     }
 
     function displayColorLine(line){
+        console.debug(line)
         var start;
         var end;
-        start=textEditInput.positionAt(0,line*fontMetrics.height+(fontMetrics.height/2))
-        end=textEditInput.positionAt(textEditInput.width,line*fontMetrics.height+(fontMetrics.height/2))
+        start=textEditInput.positionAt(0,line*fontMetrics.height-(fontMetrics.height/2))
+        end=textEditInput.positionAt(textEditInput.width,line*fontMetrics.height-(fontMetrics.height/2))
         textProv=getText(start,end)
         displayColorText()
         replaceLine(textProv,start,end)
@@ -287,7 +304,8 @@ Rectangle{
     }
 
     function displayColorText(){
-        textProv=" "+textProv
+        textProv=" "+textProv+" "
+        console.debug(textProv)
         colorWord(Backend.getFuncitionKeyWords(),"#45c6d6")
         colorWord(Backend.getVariableTypWords(),"#ff8080")
         var charIndex=0;
@@ -308,6 +326,8 @@ Rectangle{
 
         }
         textProv=textProv.substring(1);
+        textProv=textProv.substring(0,textProv.length-1);
+        console.debug(textEditInput.text)
     }
 
     function colorWord(keyword,color){
@@ -359,7 +379,6 @@ Rectangle{
             }
 
             if(re.x>textflick.width+textflick.contentX){
-                console.debug(re.x,textflick.width,textflick.contentX)
                 textflick.contentX=(re.x-textflick.width)+10
             }
             else if(re.x<textflick.contentX){
