@@ -303,7 +303,7 @@ Rectangle{
         end=textEditInput.positionAt(textEditInput.width,line*fontMetrics.height-(fontMetrics.height/2))
         textProv=textEditInput.getText(start,end)
 
-        /*displayColorText()
+        displayColorText()/*
         if(line==1){
             textProv="<pre>"+textProv
         }*/
@@ -322,14 +322,14 @@ Rectangle{
         textEditInput.text=textProv
         textEditInput.cursorPosition=cursorPos
         lockBar=false
-        console.debug(textEditInput.text)
     }
 
     function displayColorText(){
         textProv=" "+textProv+" "
-        //colorWord(Backend.getFuncitionKeyWords(),"#45c6d6")
-        //colorWord(Backend.getVariableTypWords(),"#ff8080")
-/*      var charIndex=0;
+        colorWord(Backend.getFuncitionKeyWords(),"#45c6d6")
+        colorWord(Backend.getVariableTypWords(),"#ff8080")
+
+        var charIndex=0;
         var endIndex=0;
 
         while(charIndex>-1){ // Comments Coloring
@@ -345,24 +345,23 @@ Rectangle{
                 charIndex=endIndex
             }
 
-        }*/
+        }
         textProv=textProv.substring(1);
         textProv=textProv.substring(0,textProv.length-1);
     }
 
     function colorWord(keyword,color){
-        /*for(var i=0;i<keyword.length;i++){
-            replaceString(keyword[i],"<font color=\""+color+"\">")
-        }*/
-        replaceString("pause","<font color=\""+color+"\">")
+        var search= new RegExp(" ", "g")
+         textProv=textProv.replace(search,String.fromCharCode(217)+String.fromCharCode(218))
+        for(var i=0;i<keyword.length;i++){
+            search=new RegExp(String.fromCharCode(218)+keyword[i]+String.fromCharCode(217), "g")
+            textProv=textProv.replace(search,String.fromCharCode(218)+"<font color=\""+color+"\">"+keyword[i]+"</font>"+String.fromCharCode(217))
+        }
+        search= new RegExp(String.fromCharCode(217)+String.fromCharCode(218), "g")
+        textProv=textProv.replace(search," ")
+
     }
 
-    function replaceString(word,fontStartText){
-        console.debug(word, textProv)
-        var search=new RegExp(" "+word+" ", "g")
-        textProv=textProv.replace(search," "+fontStartText+word+"</font> ")
-        console.debug(word, textProv)
-    }
     function deleteHtml(stringProv){
         var charIndex=0
         var search=new RegExp("</font>", "g")
