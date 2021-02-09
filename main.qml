@@ -22,13 +22,14 @@ Window {
             text: "try"
             onClicked: {
                     Backend.tryCommand(textInput.getProgramm())
-
+                    textInput.programmRunning=true
             }
         }
         Button{
             text: "stop"
             onClicked: {
                     Backend.stopJoints()
+                    textInput.programmRunning=false
                 }
         }
         Button{
@@ -36,6 +37,7 @@ Window {
             onClicked: {
                     stopButton.visible=true;
                     Backend.loopCommand(textInput.editor.text)
+                    textInput.programmRunning=true
                 }
         }
         Button{
@@ -44,6 +46,7 @@ Window {
             text: "stop Loop"
             onClicked: {
                 Backend.stopLoop()
+                textInput.programmRunning=false
             }
         }
     }
@@ -92,8 +95,11 @@ Window {
         onNewRespond:{
             textOutput.text=output+'\n'+textOutput.text
         }
-        onNewRunningProgramm:{
-            runningCode.editor.text=programm
+        onErrorOccured:{
+            textInput.programmRunning=false
+        }
+        onProgrammFinished:{
+            textInput.programmRunning=false
         }
     }
 }

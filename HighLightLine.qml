@@ -21,12 +21,12 @@ Item{
             }
 
         }
-    visible: live
     Text{
        id:text
        anchors.right: parent.right
        anchors.rightMargin: 5
        color: textColor
        text:lineId.text
+       font: textEditInput.font
     }
 }

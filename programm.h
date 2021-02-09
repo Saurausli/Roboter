@@ -32,7 +32,7 @@ signals:
     void newRunningProgramm(QString programm);
     void newRunningCommand(int commandLine);
     void errorOccured();
-    void ProgrammFinished();
+    void programmFinished();
 
 public slots:
     void stopJoints();

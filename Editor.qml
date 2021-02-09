@@ -10,6 +10,7 @@ Rectangle{
     property variant error: []
     property variant errorMessage: []
     property alias editor: textEditInput
+    property bool programmRunning: false
     FontMetrics {
         id: fontMetrics
         font: textEditInput.font
@@ -20,12 +21,8 @@ Rectangle{
             liveCommand=commandLine
         }
         onErrorOccured:{
-            console.debug(line,error,error.length)
-            error[error.length]=line
-            var a=[];
-            a=error
-            error=a
-            console.debug(line,error)
+            error=Backend.getErrorLineVec();
+            errorMessage=Backend.getErrorMessageVec()
         }
         onNewRunningProgramm:{
             error=[]
@@ -144,6 +141,7 @@ Rectangle{
             id:textEditInput
             clip:true
             renderType: Text.NativeRendering
+            readOnly: programmRunning
             property int lengthPrevious: 0
             property int cursorLine: (cursorRectangle.y+fontMetrics.height)/fontMetrics.height
             onCursorLineChanged: {
@@ -184,6 +182,39 @@ Rectangle{
                     displayColorLine(cursorLine);
                 }
             }
+            MouseArea{
+                anchors.fill:parent
+                acceptedButtons: Qt.RightButton
+                onClicked: contextMenu.open()
+            }
+            HighLightLine{
+               line:liveCommand
+               height: fontMetrics.height
+               width: textflick.width
+               color: "#588a2c"
+               visible: programmRunning
+            }
+            Repeater{
+                model: error.length
+                HighLightLine{
+                    line:error[index]
+                    height: fontMetrics.height
+                    width: textflick.width
+                    text:{
+                        var t
+                        if(errorMessage.length>index){
+                            t= errorMessage[index].substring(errorMessage[index].indexOf("Error:")+7)
+                            t= t.substring(0,t.indexOf(";"))
+                        }
+                        else{
+                            return ""
+                        }
+                    }
+                    color: "#473233"
+                    textColor: "#e58076"
+                }
+            }
+
             Menu {
                     id: contextMenu
                     //background:
@@ -264,7 +295,8 @@ Rectangle{
         var cursorPos=textEditInput.cursorPosition
 
         string=toRichText(string)
-        //textEditInput.text="<pre>"+string+"</pre>"
+        textEditInput.remove(0,textEditInput.length)
+        textEditInput.insert(0,string)
 
         lockBar=false
         displayColorTextAll()
@@ -395,7 +427,6 @@ Rectangle{
             }
 
             if(re.x>textflick.width+textflick.contentX){
-                console.debug(re.x,textflick.width,textflick.contentX)
                 textflick.contentX=(re.x-textflick.width)+10
             }
             else if(re.x<textflick.contentX){

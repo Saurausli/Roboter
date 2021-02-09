@@ -106,7 +106,7 @@ void Programm::newRunningCommandSlot(int lineID){
 }
 
 void Programm::ProgrammFinishedSlot(){
-    emit ProgrammFinished();
+    emit programmFinished();
 }
 
 void Programm::gotoSlot(unsigned int line){
