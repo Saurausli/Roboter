@@ -7,7 +7,7 @@ Rectangle{
     property string textProv
     property bool lockBar: false
     property int liveCommand: -1
-    property variant errorLine: []
+    property variant error: []
     property variant errorMessage: []
     property alias editor: textEditInput
     FontMetrics {
@@ -105,6 +105,9 @@ Rectangle{
                     removeColor()
                     var search=new RegExp(" "+textEditInput.cursorLine+" ", "g")
                     text=text.replace(search," <b><font color=\"#d6c540\">"+textEditInput.cursorLine+"</font> ")
+                    /*console.debug("-------------------------------------------------------")
+                    console.debug(text)
+                    console.debug("-------------------------------------------------------")*/
                 }
                 function removeColor(){
                     var search=new RegExp("<b><font color=\"#d6c540\">", "g")
@@ -154,7 +157,7 @@ Rectangle{
             onCursorLineChanged: {
                 ensureVisible(cursorRectangle)
             }
-
+            //renderType: Text.NativeRendering
             width: contentWidth<textflick.width ? textflick.width : contentWidth
             height: contentHeight<textflick.height ? textflick.height  : lineCount*fontMetrics.height
             selectByKeyboard: true
@@ -165,7 +168,9 @@ Rectangle{
             selectedTextColor: "#bec0c2"
             selectionColor: "#1d545c"
             onCursorRectangleChanged: ensureVisible(cursorRectangle)
-            textFormat:TextEdit.RichText
+            textFormat:Text.RichText
+            wrapMode: TextEdit.NoWrap
+            text: ""
             property int prevLinCount: 0
             onLengthChanged: {
                 if(!lockBar&&length!=lengthPrevious){
@@ -254,35 +259,25 @@ Rectangle{
         temp=temp.replace(search,"\n")
         return temp
     }
+
     function setText(string){
         lockBar=true
-        //string="<pre>"+string+"</pre>"
-        var cursorPos
-        cursorPos=textEditInput.cursorPosition
+        var cursorPos=textEditInput.cursorPosition
+
         string=toRichText(string)
-        textEditInput.text=string
-        textEditInput.cursorPosition=cursorPos
+        //textEditInput.text="<pre>"+string+"</pre>"
+
         lockBar=false
         displayColorTextAll()
+        textEditInput.cursorPosition=cursorPos
         ensureVisible(textEditInput.cursorRectangle)
 
     }
+
     function toRichText(string){
-        var replaceStringTemp=String.fromCharCode(8233)
+        var replaceStringTemp="<br>"//String.fromCharCode(8233)
         string=string.replace(/\n/g,replaceStringTemp)//Replace plain \n with html "\n"
         return string
-    }
-
-    function replaceLine(newString,start,end){
-        lockBar=true
-        var cursorPos
-        cursorPos=textEditInput.cursorPosition
-        //newString=toRichText(newString)
-        textEditInput.remove(start,end)
-        textEditInput.insert(start,"<pre>"+newString+"</pre>")
-        textEditInput.cursorPosition=cursorPos
-        lockBar=false
-        console.debug(textEditInput.text)
     }
 
     function displayColorTextAll(){
@@ -292,26 +287,41 @@ Rectangle{
     }
 
     function displayColorLine(line){
-        console.debug(line)
         var start;
         var end;
         start=textEditInput.positionAt(0,line*fontMetrics.height-(fontMetrics.height/2))
         end=textEditInput.positionAt(textEditInput.width,line*fontMetrics.height-(fontMetrics.height/2))
-        textProv=getText(start,end)
+        textProv=textEditInput.getText(start,end)
         displayColorText()
-        replaceLine(textProv,start,end)
+        /*if(line==1){
+            textProv="<pre>"+textProv
+        }*/
+        if(line==textEditInput.lineCount){
+           // textProv=textProv+"</pre>"
+        }
+        lockBar=true
+        var cursorPos
+        cursorPos=textEditInput.cursorPosition
+        textProv=toRichText(textProv)
+        textEditInput.remove(start,end)
+        textEditInput.insert(start,textProv)
+        textProv=textEditInput.getFormattedText(0,textEditInput.length)
+        textProv=textProv.replace("white-space: pre-wrap","white-space: pre")
+        //console.debug(textProv)
+        textEditInput.text=textProv
+        textEditInput.cursorPosition=cursorPos
+        lockBar=false
         //console.debug(textEditInput.text)
     }
 
     function displayColorText(){
         textProv=" "+textProv+" "
-        console.debug(textProv)
         colorWord(Backend.getFuncitionKeyWords(),"#45c6d6")
-        colorWord(Backend.getVariableTypWords(),"#ff8080")
-        var charIndex=0;
+        //colorWord(Backend.getVariableTypWords(),"#ff8080")
+/*      var charIndex=0;
         var endIndex=0;
 
-            while(charIndex>-1){
+        while(charIndex>-1){ // Comments Coloring
             charIndex =textProv.indexOf("//",charIndex);
             if(charIndex>=0){
                 endIndex=textProv.indexOf("\n",charIndex+2)
@@ -324,27 +334,23 @@ Rectangle{
                 charIndex=endIndex
             }
 
-        }
+        }*/
         textProv=textProv.substring(1);
         textProv=textProv.substring(0,textProv.length-1);
-        console.debug(textEditInput.text)
     }
 
     function colorWord(keyword,color){
-        for(var i=0;i<keyword.length;i++){
+        /*for(var i=0;i<keyword.length;i++){
             replaceString(keyword[i],"<font color=\""+color+"\">")
-        }
+        }*/
+        replaceString("pause","<font color=\""+color+"\">")
     }
 
     function replaceString(word,fontStartText){
-        var search=new RegExp("\n"+word+"\n", "g")
-        textProv=textProv.replace(search,"\n"+fontStartText+word+"</font>\n")
-        search=new RegExp("\n"+word+" ", "g")
-        textProv=textProv.replace(search,"\n"+fontStartText+word+"</font> ")
-        search=new RegExp(" "+word+"\n", "g")
-        textProv=textProv.replace(search," "+fontStartText+word+"</font>\n")
-        search=new RegExp(" "+word+" ", "g")
+        console.debug(word, textProv)
+        var search=new RegExp(" "+word+" ", "g")
         textProv=textProv.replace(search," "+fontStartText+word+"</font> ")
+        console.debug(word, textProv)
     }
     function deleteHtml(stringProv){
         var charIndex=0
