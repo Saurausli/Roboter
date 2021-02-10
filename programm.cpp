@@ -13,15 +13,37 @@ Programm::~Programm(){
 
 }
 void Programm::compileProgram(QString arg_program){
-    vector<vector<QString>> stringProgram; // stringProgram[line][word]
-    vector<QString> lineVec;
-    lineVec=split(arg_program,'\n');
-    for(unsigned long i=0; i<lineVec.size();i++){
-        stringProgram.push_back(split(lineVec[i],' '));
-        stringProgram[i].erase(remove(stringProgram[i].begin(),stringProgram[i].end(),""),stringProgram[i].end());
-        stringProgram[i].shrink_to_fit();
-    }
+    try {
+        vector<vector<QString>> stringProgram; // stringProgram[line][word]
+        vector<QString> lineVec;
+        lineVec=split(arg_program,'\n');
+        for(unsigned long i=0; i<lineVec.size();i++){
+            stringProgram.push_back(split(lineVec[i],' '));
+            stringProgram[i].erase(remove(stringProgram[i].begin(),stringProgram[i].end(),""),stringProgram[i].end());
+            stringProgram[i].shrink_to_fit();
+        }
+        vector<Variable*> varVec;
+        Variable x(VariableType::integer,"x");
+        Variable y(VariableType::integer);
+        x.setValue(163);
+        y.setValue(23);
+        varVec.push_back(&x);
+        varVec.push_back(&y);
+        Operation op(varVec,Operator::plus);
+        vector<Variable*> varVec2;
+        Variable k(VariableType::integer);
+        k.setValue(12);
+        varVec2.push_back(op.getResult());
+        varVec2.push_back(&k);
 
+        qDebug()<<varVec2[0]->getVariableType();
+        op.calc();
+        Operation op2(varVec2,Operator::minus);
+        op2.calc();
+    }
+    catch(Error *er){
+        qDebug()<<er->getMessage();
+    }
 }
 
 vector<QString> Programm::split(QString _str, char delimiter) {

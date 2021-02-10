@@ -14,6 +14,7 @@ public:
     Variable(VariableType arg_type,QString arg_name);
     Variable(VariableType arg_type);
     void setValue(QString arg_value);
+    void setValue(int arg_value);
     int getValuetoInt();
     QString getName();
     VariableType getVariableType();
@@ -22,6 +23,7 @@ private:
     QVariant *value;
     VariableType type;
     QString name;
+    void varSetup(VariableType arg_type,QString arg_name);
 };
 
 #endif // VARIABLE_H

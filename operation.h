@@ -30,6 +30,7 @@ private:
     void checkMinLength(vector<Variable*>  &com,unsigned long len);
     void checkMaxLength(vector<Variable*>  &com,unsigned long len);
     void checkMinMaxLength(vector<Variable*>  &com,unsigned long min,unsigned long max);
+    void checkAllVarType(vector<Variable*> arg_vec, VariableType arg_typ);
     vector<Variable*> varVec;
     Operator operatorSymbol;
     Variable *result;

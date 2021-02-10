@@ -9,11 +9,13 @@ Operation::Operation(vector<Variable*> arg_VarVec,Operator arg_Op)
                 case Operator::plus:
                     checkLength(varVec,2);
                     checkAllVarType(arg_VarVec,VariableType::integer);
+                    result= new Variable(VariableType::integer);
             break;
             case Operator::minus:
-                checkLength(varVec,2);
-                checkAllVarType(arg_VarVec,VariableType::integer);
-                break;
+                    checkLength(varVec,2);
+                    checkAllVarType(arg_VarVec,VariableType::integer);
+                    result= new Variable(VariableType::integer);
+                    break;
         }
     }
     catch(Error *er){
@@ -27,13 +29,13 @@ Variable* Operation::getResult(){
 void Operation::calc(){
     switch (operatorSymbol) {
             case Operator::plus:
-                result= new Variable(VariableType::integer);
-        break;
-        case Operator::minus:
-            checkLength(varVec,2);
-            checkAllVarType(arg_VarVec,VariableType::integer);
-            break;
+                result->setValue(varVec[0]->getValuetoInt()+varVec[1]->getValuetoInt());
+                break;
+            case Operator::minus:
+                result->setValue(varVec[0]->getValuetoInt()-varVec[1]->getValuetoInt());
+                break;
     }
+    qDebug()<<result->getValuetoInt();
 }
 
 Operator Operation::getOperator(QString arg_operatorName){
@@ -66,7 +68,7 @@ void Operation::checkMinMaxLength(vector<Variable*> &com,unsigned long min,unsig
     checkMaxLength(com,max);
 }
 
-void checkAllVarType(vector<Variable*> arg_vec, VariableType arg_typ){
+void Operation::checkAllVarType(vector<Variable*> arg_vec, VariableType arg_typ){
     for(unsigned int i=0;i<arg_vec.size();i++){
         if(arg_vec[i]->getVariableType()!=arg_typ){
             throw(new Error("not all Argument have the same type"));

@@ -1,10 +1,8 @@
 #include "error.h"
 
-Error::Error(unsigned _line,QString _message,QString _command)
+Error::Error(QString _message)
 {
-    line=_line;
     message=_message+"; ";
-    command=_command;
 }
 
 unsigned Error::getLine(){

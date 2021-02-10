@@ -13,7 +13,7 @@
 #include "error.h"
 #include "command.h"
 #include <fstream>
-
+#include "operation.h"
 using namespace std;
 
 
