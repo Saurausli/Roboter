@@ -12,21 +12,45 @@ Programm::~Programm(){
 
 
 }
+void Programm::compileProgram(QString arg_program){
+    vector<vector<QString>> stringProgram; // stringProgram[line][word]
+    vector<QString> lineVec;
+    lineVec=split(arg_program,'\n');
+    for(unsigned long i=0; i<lineVec.size();i++){
+        stringProgram.push_back(split(lineVec[i],' '));
+        stringProgram[i].erase(remove(stringProgram[i].begin(),stringProgram[i].end(),""),stringProgram[i].end());
+        stringProgram[i].shrink_to_fit();
+    }
 
+}
 
+vector<QString> Programm::split(QString _str, char delimiter) {
+  string str=_str.toStdString();
+    vector<QString> internal;
+  stringstream ss(str); // Turn the string into a stream.
+  string tok;
+
+  while(getline(ss, tok, delimiter)) {
+    internal.push_back(QString::fromStdString(tok));
+  }
+
+  return internal;
+}
+
+/*
 bool Programm::checkProgramm(QString _Programm){
-    /*
+    *//*
      Doublemotor M1M2 22 23 24 25
      Joint J1 M1M2 0 3680 -3680
      Joint J2 M1M2 1 4000 -4000
-     */
+     *//*
     globalVaribles= new GlobalVariables;
     /*DoubleJointMotor *dJ=new DoubleJointMotor("hallo",22,23,24,25,&globalVaribles->tempo);
     globalVaribles->doubleJointMotor.push_back(dJ);
     globalVaribles->joints.push_back(new Joint("J1",3680,-3680));
     globalVaribles->joints[globalVaribles->joints.size()-1]->setDoubleJointMotor(globalVaribles->doubleJointMotor[0],0);
     globalVaribles->joints.push_back(new Joint("J2",4000,-4000));
-    globalVaribles->joints[globalVaribles->joints.size()-1]->setDoubleJointMotor(globalVaribles->doubleJointMotor[0],1);*/
+    globalVaribles->joints[globalVaribles->joints.size()-1]->setDoubleJointMotor(globalVaribles->doubleJointMotor[0],1);*//*
     globalVaribles->tempo=100;
 
     //connect(this,SIGNAL(ProgrammFinished()),this,SLOT(nextProgramm()));
@@ -125,4 +149,4 @@ void Programm::commandError(Error er){
     emit errorOccured();
     emit stopJoints();
 
-}
+}*/

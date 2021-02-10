@@ -79,7 +79,7 @@ class Command:public QObject
     public:
         explicit Command(GlobalVariables& _globalVariables,int _programmLine, QString _command, QObject *parent= nullptr);
         ~Command();
-        void checkCommand();
+   /*     void checkCommand();
         Function getFunction();
         unsigned int getLine();
         static vector<QString> split(QString _str, char delimiter);
@@ -116,7 +116,7 @@ class Command:public QObject
         int findJoint(QString name);
         void checkMotor(QString name, bool &doubleMotor);
     private slots:
-        void commandFinishedSlot();
+        void commandFinishedSlot();*/
 };
 
 

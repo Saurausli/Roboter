@@ -21,14 +21,14 @@ Window {
         Button{
             text: "try"
             onClicked: {
-                    Backend.tryCommand(textInput.getProgramm())
+                    Backend.tryProgram(textInput.getProgramm())
                     textInput.programmRunning=true
             }
         }
         Button{
             text: "stop"
             onClicked: {
-                    Backend.stopJoints()
+                    //Backend.stopJoints()
                     textInput.programmRunning=false
                 }
         }

@@ -14,7 +14,9 @@ SOURCES += \
         error.cpp \
         joint.cpp \
         main.cpp \
-        programm.cpp
+        operation.cpp \
+        programm.cpp \
+        variable.cpp
 
 HEADERS += \
     command.h \
@@ -22,7 +24,9 @@ HEADERS += \
     doublejointmotor.h \
     error.h \
     joint.h \
-    programm.h
+    operation.h \
+    programm.h \
+    variable.h
 
 RESOURCES += \
     Ressourcen.qrc

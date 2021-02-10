@@ -12,7 +12,7 @@ typedef std::vector<Error> ErrorList;
 class Error
 {
 public:
-    Error(unsigned _line,QString _message,QString _command);
+    Error(QString _message);
     unsigned getLine();
     void addToMessage(QString _message);
     QString getMessage();

@@ -13,7 +13,10 @@ class ConsoleUi: public Programm
 public:
     explicit ConsoleUi(QObject *parent= nullptr);
     ~ConsoleUi();
-
+public slots:
+    void tryProgram(QString arg_program);
+    //void loopProgram(QString arg_program);
+/*
 signals:
     void getStop();
 public slots:
@@ -24,7 +27,7 @@ public slots:
     QVector<QString> getErrorMessageVec();
     QString loadFile();
     QVector<QString> getFuncitionKeyWords();
-    QVector<QString> getVariableTypWords();
+    QVector<QString> getVariableTypWords();*/
 private:
     QQmlApplicationEngine *engine;
     QQmlContext* context;

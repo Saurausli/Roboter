@@ -24,15 +24,19 @@ class Programm:public QObject
 public:
     explicit Programm(QObject *parent= nullptr);
     ~Programm();
-    bool checkProgramm(QString _Programm);
+
+
+   /* bool checkProgramm(QString _Programm);
     void connectProgramm(bool _loop);
-    void startProgramm();
+    void startProgramm();*/
+    void compileProgram(QString arg_program);
+    static vector<QString> split(QString _str, char delimiter);
 signals:
     void newRespond(QString output);
-    void newRunningProgramm(QString programm);
+    void newRunningProgram(QString programm);
     void newRunningCommand(int commandLine);
     void errorOccured();
-    void programmFinished();
+    void programmFinished();/*
 
 public slots:
     void stopJoints();
@@ -49,7 +53,7 @@ private slots:
     void newRunningCommandSlot(int lineID);
     void ProgrammFinishedSlot();
     void gotoSlot(unsigned int line);
-    void commandError(Error er);
+    void commandError(Error er);*/
 };
 
 #endif // Programm_H

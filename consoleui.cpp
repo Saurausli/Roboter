@@ -8,7 +8,7 @@ ConsoleUi::ConsoleUi(QObject *parent) :
     context = engine->rootContext();
     context->setContextProperty ("Backend", this);
     engine->load(QUrl(QStringLiteral("qrc:/main.qml")));
-    loop=false;
+    //loop=false;
 
 }
 
@@ -16,6 +16,11 @@ ConsoleUi::~ConsoleUi(){
 
 }
 
+void ConsoleUi::tryProgram(QString arg_program){
+    compileProgram(arg_program);
+}
+
+/*
 void ConsoleUi::tryCommand(QString programm){
     if(checkProgramm(programm)){
         connectProgramm(false);
@@ -34,7 +39,7 @@ void ConsoleUi::stopLoop(){
     loop=false;
     disconnect(programmVec[programmVec.size()-1],SIGNAL(commandFinished()),programmVec[0],SLOT(exec()));
 }
-
+/*
 QVector<int> ConsoleUi::getErrorLineVec(){
    QVector<int> vec;
    for(int i=0;i<int(errorList.size());i++){
@@ -76,4 +81,4 @@ QVector<QString> ConsoleUi::getVariableTypWords(){
     vec.push_back(DEF_DOUBLEMOTOR_SYNTAX);
     vec.push_back(DEF_JOINT_SYNTAX);
     return vec;
-}
+}*/

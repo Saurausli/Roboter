@@ -5,16 +5,16 @@ Command::Command(GlobalVariables& _globalVariables,int _programmLine,
                  QString _command,QObject *parent):
     QObject(parent)
 {
-    programmLine=_programmLine;
+    /*programmLine=_programmLine;
     command=_command;
     globalVariables=&_globalVariables;
-    checkCommand();
+    checkCommand();*/
 
 }
 Command::~Command(){
 
 }
-
+/*
 void Command::checkCommand(){
     try{
 
@@ -281,7 +281,7 @@ void Command::exec(){
         emit ProgrammFinished();
         return;
     }
-}*/
+}*//*
 
 
 Function Command::getFunction(){
@@ -419,3 +419,4 @@ void Command::commandFinishedSlot(){
 
     emit commandFinished();
 }
+*/
