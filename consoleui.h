@@ -15,6 +15,7 @@ public:
     ~ConsoleUi();
 public slots:
     void tryProgram(QString arg_program);
+    QString loadFile();
     //void loopProgram(QString arg_program);
 /*
 signals:
@@ -25,7 +26,7 @@ public slots:
     void stopLoop();
     QVector<int> getErrorLineVec();
     QVector<QString> getErrorMessageVec();
-    QString loadFile();
+
     QVector<QString> getFuncitionKeyWords();
     QVector<QString> getVariableTypWords();*/
 private:

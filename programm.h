@@ -41,11 +41,15 @@ private:
     vector<Variable*> variables;
     vector<Variable*> varVec;
     vector<Operation*> operationArray;
-    Variable* getVariable(QString name);
-    Variable* getVariable(QString name, vector<Variable*> &arg_varVec);
+    bool isNumber(QString &arg_string);
+    void searchForVariable(QString arg_name);
+    void compDefineVariable(QString arg_name,VariableType arg_type);
+    void compDefineVariable(QString arg_name,VariableType arg_type,QVariant arg_value, bool error=true);
+    Variable* getVariable(QString arg_name);
+    Variable* getVariable(QString arg_name, vector<Variable*> &arg_varVec);
 
     /*
-
+x = 1
 
 public slots:
     void stopJoints();

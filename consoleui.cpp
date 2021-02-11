@@ -20,6 +20,13 @@ void ConsoleUi::tryProgram(QString arg_program){
     compileProgram(arg_program);
 }
 
+QString ConsoleUi::loadFile(){
+    std::ifstream savefile("savefile.txt");
+    stringstream buffer;
+    buffer<<savefile.rdbuf();
+    return QString::fromStdString(buffer.str());
+}
+
 /*
 void ConsoleUi::tryCommand(QString programm){
     if(checkProgramm(programm)){
@@ -39,7 +46,7 @@ void ConsoleUi::stopLoop(){
     loop=false;
     disconnect(programmVec[programmVec.size()-1],SIGNAL(commandFinished()),programmVec[0],SLOT(exec()));
 }
-/*
+
 QVector<int> ConsoleUi::getErrorLineVec(){
    QVector<int> vec;
    for(int i=0;i<int(errorList.size());i++){
@@ -56,12 +63,7 @@ QVector<QString> ConsoleUi::getErrorMessageVec(){
    return vec;
 }
 
-QString ConsoleUi::loadFile(){
-    std::ifstream savefile("savefile.txt");
-    stringstream buffer;
-    buffer<<savefile.rdbuf();
-    return QString::fromStdString(buffer.str());
-}
+
 
 QVector<QString> ConsoleUi::getFuncitionKeyWords(){
    QVector<QString> vec;

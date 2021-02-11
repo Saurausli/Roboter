@@ -24,9 +24,9 @@ Rectangle{
             error=Backend.getErrorLineVec();
             errorMessage=Backend.getErrorMessageVec()
         }
-        onNewRunningProgramm:{
+        /*onNewRunningProgramm:{
             error=[]
-        }
+        }*/
     }
     Flickable{
         id:sideNum
@@ -42,10 +42,6 @@ Rectangle{
         Rectangle{
             id:sideNumRec
             width:(0.8125*num.font.pointSize*(' '+(textEditInput.lineCount)).length)+10+num.anchors.leftMargin
-            onWidthChanged: {
-                console.debug("num",width,(' '+(textEditInput.lineCount)).length,0.8125*num.font.pointSize)
-            }
-
             height: textEditInput.height+(textflick.anchors.margins*2)
             clip: true
             color: "#404244"

@@ -14,34 +14,74 @@ Programm::~Programm(){
 }
 void Programm::compileProgram(QString arg_program){
     try {
-        vector<vector<QString>> stringProgram; // stringProgram[line][word]
+
+        ////---------------------------------------------------------------------------------////
+        ////-----------------------------------PREPARATION-----------------------------------////
+        ////---------------------------------------------------------------------------------////
+
+        // save Program
+
+        ofstream file("savefile.txt");
+        file<< arg_program.toStdString();
+        file.close();
+
+        // stringProgram[line][word]
+
+        vector<vector<QString>> stringProgram;
         vector<QString> lineVec;
+
+        // Split Programm into lines
+
         lineVec=split(arg_program,'\n');
-        for(unsigned long i=0; i<lineVec.size();i++){
+        for(unsigned long i=0; i<lineVec.size();i++){ // Split Programm into words
             stringProgram.push_back(split(lineVec[i],' '));
             stringProgram[i].erase(remove(stringProgram[i].begin(),stringProgram[i].end(),""),stringProgram[i].end());
             stringProgram[i].shrink_to_fit();
         }
 
-        /*Variable x(VariableType::integer,"x");
-        Variable y(VariableType::integer);
-        x.setValue(163);
-        y.setValue(23);
-        varVec.push_back(&x);
-        varVec.push_back(&y);
-        Operation op(varVec,Operator::plus);
-        vector<Variable*> varVec2;
-        Variable k(VariableType::integer);
-        k.setValue(12);
-        varVec2.push_back(op.getResult());
-        varVec2.push_back(&k);
+        // replace numbers with Variables
+        for(unsigned long i=0;i<stringProgram.size();i++){
+            for(unsigned long j=0;j<stringProgram[i].size();j++){
+                if(isNumber(stringProgram[i][j])){
+                    compDefineVariable("#int_"+stringProgram[i][j],VariableType::integer,stringProgram[i][j].toInt(),false);
+                    stringProgram[i][j]="#int_"+stringProgram[i][j];
+                }
+            }
+        }
+        varVec.clear();
 
-        qDebug()<<varVec2[0]->getVariableType();
-        op.calc();
-        Operation op2(varVec2,Operator::minus);
-        op2.calc();*/
-        for(int i=0;i<stringProgram.size();i++){
+        ////---------------------------------------------------------------------------------////
+        ////------------------------------------Compiling------------------------------------////
+        ////---------------------------------------------------------------------------------////
 
+
+        for(unsigned long i=0;i<stringProgram.size();i++){
+            if (stringProgram[i].size()>0) {
+                if(stringProgram[i][0].mid(0,2)!="//"){
+
+                    if(stringProgram[i].size()>1){
+                        unsigned startPos=1;
+                        if(stringProgram[i][0]==VariableSyntaxInteger){
+                            compDefineVariable(stringProgram[i][1],VariableType::integer);
+                            startPos=2;
+                        }
+                        if(stringProgram[i].size()>startPos+2){
+                            if(stringProgram[i][startPos]==OperatorSyntaxEqual){
+                                if(stringProgram[i].size()>stringProgram[i].size()>startPos+1){
+
+                                }
+                                else{
+                                    throw(new Error("expected expression"));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        /*
+        for(unsigned long i=0;i<stringProgram.size();i++){
             if(stringProgram[i].size()>1){
                 if(VariableSyntaxInteger==stringProgram[i][0]){
                     varVec.push_back(new Variable(VariableType::integer,stringProgram[i][1]));
@@ -69,15 +109,18 @@ void Programm::compileProgram(QString arg_program){
                         provOperVec.push_back(getVariable(stringProgram[i][4],varVec));
                         Operation op(provOperVec,getVariable(stringProgram[i][0],varVec),Operation::getOperator(stringProgram[i][3]));
                         op.setResultVariable(getVariable(stringProgram[i][0],varVec));
-                        operationArray.push_back(op);
+                        operationArray.push_back(&op);
                         qDebug()<<op.getResult()->getValuetoInt();
                 }
             }
         }
-    }
+    }*/
+
+    //execute Program
+
     for(unsigned long i=0;i<operationArray.size();i++){
-        operationArray[i]->calc();
-    }
+        operationArray[i]->exec();
+        }
     }
     catch(Error *er){
         qDebug()<<er->getMessage();
@@ -96,13 +139,49 @@ vector<QString> Programm::split(QString _str, char delimiter) {
 
   return internal;
 }
-Variable* Programm::getVariable(QString name){
-    return getVariable(name,varVec);
+bool Programm::isNumber(QString &arg_string){
+    bool ok;
+    arg_string.toInt(&ok,10);
+    return ok;
+}
+void Programm::searchForVariable(QString arg_name){
+    for(unsigned long i=0;i<varVec.size();i++){
+        if(varVec[i]->getName()==arg_name){
+            return;
+        }
+    }
+    throw(new Error(arg_name+" not defined"));
 }
 
-Variable* Programm::getVariable(QString name, vector<Variable*> &arg_varVec){
+void Programm::compDefineVariable(QString arg_name,VariableType arg_type){
+    compDefineVariable(arg_name,arg_type,QVariant(0));
+}
+
+void Programm::compDefineVariable(QString arg_name,VariableType arg_type,QVariant arg_value, bool error){
+    bool free=true;
+    for(unsigned long i=0;i<varVec.size();i++){
+        if(varVec[i]->getName()==arg_name){
+            free= false;
+        }
+    }
+    if(free){
+        operationArray.push_back(new Operation(new Variable(arg_type,arg_name,arg_value),Operator::defineVariable,&varVec));
+        varVec.push_back(operationArray[operationArray.size()-1]->getResult());
+    }
+    else{
+        if(error){
+            throw(new Error(arg_name+" already exist"));
+        }
+    }
+}
+
+Variable* Programm::getVariable(QString arg_name){
+    return getVariable(arg_name,varVec);
+}
+
+Variable* Programm::getVariable(QString arg_name, vector<Variable*> &arg_varVec){
     for(unsigned long i=0;i<arg_varVec.size();i++){
-        if(arg_varVec[i]->getName()==name){
+        if(varVec[i]->getName()==arg_name){
             return arg_varVec[i];
         }
     }

@@ -13,8 +13,8 @@ enum VariableType{
 class Variable
 {
 public:
+    Variable(VariableType arg_type,QString arg_name,QVariant arg_value);
     Variable(VariableType arg_type,QString arg_name);
-    Variable(VariableType arg_type);
     void setValue(QString arg_value);
     void setValue(int arg_value);
     int getValuetoInt();

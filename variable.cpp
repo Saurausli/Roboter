@@ -1,12 +1,13 @@
 #include "variable.h"
 
-Variable::Variable(VariableType arg_type,QString arg_name){
+Variable::Variable(VariableType arg_type,QString arg_name,QVariant arg_value){
+    value=&arg_value;
     varSetup(arg_type,arg_name);
 }
 
-Variable::Variable(VariableType arg_type)
+Variable::Variable(VariableType arg_type,QString arg_name)
 {
-    varSetup(arg_type,"");
+    varSetup(arg_type,arg_name);
 }
 
 void Variable::setValue(QString arg_value){
