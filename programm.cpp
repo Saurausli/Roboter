@@ -68,7 +68,10 @@ void Programm::compileProgram(QString arg_program){
                         if(stringProgram[i].size()>startPos+2){
                             if(stringProgram[i][startPos]==OperatorSyntaxEqual){
                                 if(stringProgram[i].size()>stringProgram[i].size()>startPos+1){
-
+                                   if(stringProgram[i].size()>stringProgram[i].size()==startPos+2){
+                                       searchForVariable(stringProgram[i][startPos+1]);
+                                       operationArray.push_back(new Operation(getVariable(stringProgram[i][startPos+1]),getVariable(stringProgram[i][startPos-1])));
+                                   }
                                 }
                                 else{
                                     throw(new Error("expected expression"));
@@ -79,7 +82,7 @@ void Programm::compileProgram(QString arg_program){
                 }
             }
         }
-
+        //varVec.clear();
         /*
         for(unsigned long i=0;i<stringProgram.size();i++){
             if(stringProgram[i].size()>1){
@@ -122,6 +125,7 @@ void Programm::compileProgram(QString arg_program){
         operationArray[i]->exec();
         }
     }
+    for
     catch(Error *er){
         qDebug()<<er->getMessage();
     }
@@ -129,7 +133,7 @@ void Programm::compileProgram(QString arg_program){
 
 vector<QString> Programm::split(QString _str, char delimiter) {
   string str=_str.toStdString();
-    vector<QString> internal;
+   vector<QString> internal;
   stringstream ss(str); // Turn the string into a stream.
   string tok;
 
