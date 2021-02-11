@@ -4,6 +4,8 @@
 #include <QObject>
 #include <QDebug>
 #include "error.h"
+
+#define VariableSyntaxInteger "int"
 enum VariableType{
     integer
 };

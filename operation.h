@@ -10,6 +10,8 @@
 #define OperatorSyntaxPlus "+"
 #define OperatorSyntaxMinus "-"
 
+#define OperatorSyntaxEqual "="
+
 using namespace std;
 
 enum Operator{
@@ -21,9 +23,10 @@ enum Operator{
 class Operation
 {
 public:
-    Operation(vector<Variable*> arg_VarVec,Operator arg_Op);
+    Operation(vector<Variable*> arg_VarVec,Variable* arg_result ,Operator arg_Op);
     void calc();
     Variable* getResult();
+    void setResultVariable(Variable *arg_var);
     static Operator getOperator(QString arg_operatorName);
 private:
     void checkLength(vector<Variable*>  &com,unsigned long len);
@@ -31,6 +34,7 @@ private:
     void checkMaxLength(vector<Variable*>  &com,unsigned long len);
     void checkMinMaxLength(vector<Variable*>  &com,unsigned long min,unsigned long max);
     void checkAllVarType(vector<Variable*> arg_vec, VariableType arg_typ);
+    void checkVarType(Variable* arg_var, VariableType arg_typ);
     vector<Variable*> varVec;
     Operator operatorSymbol;
     Variable *result;

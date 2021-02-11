@@ -22,8 +22,8 @@ void Programm::compileProgram(QString arg_program){
             stringProgram[i].erase(remove(stringProgram[i].begin(),stringProgram[i].end(),""),stringProgram[i].end());
             stringProgram[i].shrink_to_fit();
         }
-        vector<Variable*> varVec;
-        Variable x(VariableType::integer,"x");
+
+        /*Variable x(VariableType::integer,"x");
         Variable y(VariableType::integer);
         x.setValue(163);
         y.setValue(23);
@@ -39,7 +39,45 @@ void Programm::compileProgram(QString arg_program){
         qDebug()<<varVec2[0]->getVariableType();
         op.calc();
         Operation op2(varVec2,Operator::minus);
-        op2.calc();
+        op2.calc();*/
+        for(int i=0;i<stringProgram.size();i++){
+
+            if(stringProgram[i].size()>1){
+                if(VariableSyntaxInteger==stringProgram[i][0]){
+                    varVec.push_back(new Variable(VariableType::integer,stringProgram[i][1]));
+                    if(stringProgram[i].size()==4){
+                        if(stringProgram[i][2]==OperatorSyntaxEqual){
+                            bool ok;
+                            stringProgram[i][3].toInt(&ok,10);
+                            if(!ok){
+                                if(getVariable(stringProgram[i][3],varVec)!=nullptr){
+                                    varVec[varVec.size()-1]->setValue(stringProgram[i][3]);
+                                }
+                            }
+                            else {
+                                varVec[varVec.size()-1]->setValue(stringProgram[i][3]);
+                            }
+
+                        }
+                    }
+                }
+                else if(stringProgram[i][1]==OperatorSyntaxEqual){
+                    if(stringProgram[i].size()==5){
+                        vector<Variable*> provOperVec;
+
+                        provOperVec.push_back(getVariable(stringProgram[i][2],varVec));
+                        provOperVec.push_back(getVariable(stringProgram[i][4],varVec));
+                        Operation op(provOperVec,getVariable(stringProgram[i][0],varVec),Operation::getOperator(stringProgram[i][3]));
+                        op.setResultVariable(getVariable(stringProgram[i][0],varVec));
+                        operationArray.push_back(op);
+                        qDebug()<<op.getResult()->getValuetoInt();
+                }
+            }
+        }
+    }
+    for(unsigned long i=0;i<operationArray.size();i++){
+        operationArray[i]->calc();
+    }
     }
     catch(Error *er){
         qDebug()<<er->getMessage();
@@ -58,7 +96,18 @@ vector<QString> Programm::split(QString _str, char delimiter) {
 
   return internal;
 }
+Variable* Programm::getVariable(QString name){
+    return getVariable(name,varVec);
+}
 
+Variable* Programm::getVariable(QString name, vector<Variable*> &arg_varVec){
+    for(unsigned long i=0;i<arg_varVec.size();i++){
+        if(arg_varVec[i]->getName()==name){
+            return arg_varVec[i];
+        }
+    }
+    return nullptr;
+}
 /*
 bool Programm::checkProgramm(QString _Programm){
     *//*

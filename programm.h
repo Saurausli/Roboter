@@ -36,7 +36,16 @@ signals:
     void newRunningProgram(QString programm);
     void newRunningCommand(int commandLine);
     void errorOccured();
-    void programmFinished();/*
+    void programmFinished();
+private:
+    vector<Variable*> variables;
+    vector<Variable*> varVec;
+    vector<Operation*> operationArray;
+    Variable* getVariable(QString name);
+    Variable* getVariable(QString name, vector<Variable*> &arg_varVec);
+
+    /*
+
 
 public slots:
     void stopJoints();

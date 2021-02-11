@@ -22,7 +22,7 @@ Window {
             text: "try"
             onClicked: {
                     Backend.tryProgram(textInput.getProgramm())
-                    textInput.programmRunning=true
+                    //textInput.programmRunning=true
             }
         }
         Button{
