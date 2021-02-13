@@ -27,6 +27,22 @@ QString ConsoleUi::loadFile(){
     return QString::fromStdString(buffer.str());
 }
 
+QVector<int> ConsoleUi::getErrorLineVec(){
+   QVector<int> vec;
+   for(unsigned i=0;i<errorList->size();i++){
+        vec.push_back((*errorList)[i]->getLine());
+   }
+   return vec;
+}
+
+QVector<QString> ConsoleUi::getErrorMessageVec(){
+   QVector<QString> vec;
+   for(unsigned i=0;i<errorList->size();i++){
+        vec.push_back((*errorList)[i]->getMessage());
+   }
+   return vec;
+}
+
 /*
 void ConsoleUi::tryCommand(QString programm){
     if(checkProgramm(programm)){
@@ -47,21 +63,7 @@ void ConsoleUi::stopLoop(){
     disconnect(programmVec[programmVec.size()-1],SIGNAL(commandFinished()),programmVec[0],SLOT(exec()));
 }
 
-QVector<int> ConsoleUi::getErrorLineVec(){
-   QVector<int> vec;
-   for(int i=0;i<int(errorList.size());i++){
-        vec.push_back(errorList[i].getLine());
-   }
-   return vec;
-}
 
-QVector<QString> ConsoleUi::getErrorMessageVec(){
-   QVector<QString> vec;
-   for(int i=0;i<int(errorList.size());i++){
-        vec.push_back(errorList[i].getMessage());
-   }
-   return vec;
-}
 
 
 

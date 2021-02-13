@@ -38,6 +38,13 @@ QString Variable::getName(){
 VariableType Variable::getVariableType(){
     return type;
 }
+
+bool Variable::checkIfIsVariableType(QString arg_type){
+    VariableType varType;
+    getVariableTypeFromString(arg_type,varType);
+    return varType!=VariableType::unknown;
+}
+
 void Variable::checkNumber(QString number){
     bool ok;
     number.toInt(&ok,10);
@@ -45,6 +52,18 @@ void Variable::checkNumber(QString number){
         throw(new Error(number+" isn't a number"));
     }
 }
+
+void Variable::getVariableTypeFromString(QString arg_name, VariableType &var_Type,bool errorMessage){
+    if(arg_name==VariableSyntaxInteger){
+        var_Type =VariableType::integer;
+        return;
+    }
+    var_Type =VariableType::unknown;
+    if(errorMessage){
+        throw(new Error(arg_name +" is no Varible Type"));
+    }
+}
+
 void Variable::varSetup(VariableType arg_type,QString arg_name){
     type=arg_type;
     name=arg_name;

@@ -11,6 +11,13 @@ Rectangle{
     property variant errorMessage: []
     property alias editor: textEditInput
     property bool programmRunning: false
+    onProgrammRunningChanged: {
+        if(programmRunning){
+            error=[]
+            errorMessage=[]
+        }
+    }
+
     FontMetrics {
         id: fontMetrics
         font: textEditInput.font

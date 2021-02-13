@@ -19,14 +19,14 @@ public slots:
     //void loopProgram(QString arg_program);
 /*
 signals:
-    void getStop();
+    void getStop();*/
 public slots:
-    void tryCommand(QString programm);
-    void loopCommand(QString programm);
-    void stopLoop();
     QVector<int> getErrorLineVec();
     QVector<QString> getErrorMessageVec();
 
+    /*void tryCommand(QString programm);
+    void loopCommand(QString programm);
+    void stopLoop();
     QVector<QString> getFuncitionKeyWords();
     QVector<QString> getVariableTypWords();*/
 private:

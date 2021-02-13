@@ -7,14 +7,15 @@ using namespace std;
 
 class Error;
 
-typedef std::vector<Error> ErrorList;
+typedef std::vector<Error*> ErrorList;
 
 class Error
 {
 public:
-    Error(QString _message);
-    unsigned getLine();
-    void addToMessage(QString _message);
+    Error(QString arg_message);
+    void setLine(unsigned arg_line);
+    int getLine();
+    void addToMessage(QString arg_message);
     QString getMessage();
 
 private:

@@ -21,6 +21,7 @@ Window {
         Button{
             text: "try"
             onClicked: {
+                    textInput.programmRunning=true
                     Backend.tryProgram(textInput.getProgramm())
                     //textInput.programmRunning=true
             }
