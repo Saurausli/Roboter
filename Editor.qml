@@ -362,7 +362,7 @@ Rectangle{
     function displayColorText(){
         textProv=" "+textProv+" "
         //colorWord(Backend.getFuncitionKeyWords(),"#45c6d6")
-        //colorWord(Backend.getVariableTypWords(),"#ff8080")
+        colorWord(Backend.getVariableTypWords(),"#d69aa7")
 
         var charIndex=0;
         var endIndex=0;

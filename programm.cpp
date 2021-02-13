@@ -14,6 +14,7 @@ Programm::~Programm(){
 }
 void Programm::compileProgram(QString arg_program){
     try {
+        qDebug()<<"\n----------------------Start Preparation----------------------\n";
         varSet = new VariableSet;
         errorList = new ErrorList;
         ////---------------------------------------------------------------------------------////
@@ -32,6 +33,13 @@ void Programm::compileProgram(QString arg_program){
         for(unsigned int i=0;i<findStr.size();i++){
             arg_program.replace(findStr[i]," "+findStr[i]+" ");
         }
+        QString prov;
+        prov=OperatorSyntaxEqual;
+        prov+=" ";
+        prov+=OperatorSyntaxMinus;
+        QString prov1;
+        prov1=prov+" ";
+        arg_program.replace(prov1,prov);
         // stringProgram[line][word]
 
         vector<vector<QString>> stringProgram;
@@ -48,32 +56,43 @@ void Programm::compileProgram(QString arg_program){
 
         // replace numbers with Variables
 
-        for(unsigned long i=0;i<stringProgram.size();i++){
+        for(unsigned int i=0;i<stringProgram.size();i++){
             try{
-                for(unsigned long j=0;j<stringProgram[i].size();j++){
+                for(unsigned int j=0;j<stringProgram[i].size();j++){
                     if(Operation::isNumber(stringProgram[i][j])){
-                        operationArray.push_back(new Operation(varSet,"#int_"+stringProgram[i][j],VariableType::integer,stringProgram[i][j].toInt()));
-                        for(unsigned long x=i;x<stringProgram.size();x++){
-                            for(unsigned long y=j+1;y<stringProgram[x].size();y++){
+                        Operation op(varSet,"#int_"+stringProgram[i][j],VariableType::integer,stringProgram[i][j]);
+                        operationArray.push_back(op);
+                        unsigned int y;
+                        y=j+1;
+                        for(unsigned int x=i;x<stringProgram.size();x++){
+                            while(y<stringProgram[x].size()){
                                 if(stringProgram[i][j]==stringProgram[x][y]){
                                     stringProgram[x][y]="#int_"+stringProgram[i][j];
-                                    qDebug()<<stringProgram[x][y]<<" = #int_ + "<<stringProgram[i][j];
-                                    }
                                 }
+                                y++;
+
                             }
-                            stringProgram[i][j]="#int_"+stringProgram[i][j];
+                            y=0;
+                        }
+                        stringProgram[i][j]="#int_"+stringProgram[i][j];
+
                     }
-                }
+                    }
+
+
+
             }
             catch(Error *er){
                 er->setLine(i);
                 errorList->push_back(er);
+                qDebug()<<er->getMessage();
             }
         }
 
         ////---------------------------------------------------------------------------------////
         ////------------------------------------Compiling------------------------------------////
         ////---------------------------------------------------------------------------------////
+        qDebug()<<"\n-----------------------Start Compiling-----------------------\n";
         for(unsigned long i=0;i<stringProgram.size();i++){
             try{
             unsigned int startPos=0;
@@ -81,13 +100,13 @@ void Programm::compileProgram(QString arg_program){
                 //check for defines
                 if(Variable::checkIfIsVariableType(stringProgram[i][0])){
                      startPos=1;
-                     operationArray.push_back(new Operation(varSet,stringProgram[i][1],stringProgram[i][0]));
+                     operationArray.push_back(Operation(varSet,stringProgram[i][1],stringProgram[i][0]));
                 }
                 //check for Operations
                 if(stringProgram[i].size()>startPos+1){
                     if(stringProgram[i][startPos+1]==OperatorSyntaxEqual){
-                        vector<QString> operatorVec(&stringProgram[i][startPos],&stringProgram[i][stringProgram[i].size()]);
-                        operationArray.push_back(new Operation(varSet,operatorVec));
+                        vector<QString> operatorVec(&stringProgram[i][startPos+2],&stringProgram[i][stringProgram[i].size()]);
+                        operationArray.push_back(Operation(varSet,operatorVec,Operation::getVariable(varSet,stringProgram[i][startPos])));
                     }
                 }
             }
@@ -95,6 +114,7 @@ void Programm::compileProgram(QString arg_program){
             catch(Error *er){
                 er->setLine(i);
                 errorList->push_back(er);
+                qDebug()<<er->getMessage();
                 }
             }
         }
@@ -102,14 +122,18 @@ void Programm::compileProgram(QString arg_program){
         errorList->push_back(er);
     }
     //execute Program
+    qDebug()<<"\n------------------------Start Program------------------------\n";
     if(errorList->size()==0){
         for(unsigned long i=0;i<operationArray.size();i++){
-            operationArray[i]->exec();
+            operationArray[i].exec();
             }
+        for(int i=0;i<varSet->size();i++){
+        qDebug()<<(*varSet)[i]->getName()<<" = "<<(*varSet)[i]->getValuetoInt();}
     }
     else{
         emit errorOccured();
     }
+    qDebug()<<"\n-------------------------End Program-------------------------\n";
     emit programmFinished();
 }
 
@@ -126,14 +150,7 @@ vector<QString> Programm::split(QString _str, char delimiter) {
   return internal;
 }
 
-bool Programm::checkNameIsVariable(QString arg_name){
-    for(unsigned long i=0;i<varSet->names.size();i++){
-        if(varSet->names[i]==arg_name){
-            return true;
-        }
-    }
-    return false;
-}
+
 
 /*
 bool Programm::checkProgramm(QString _Programm){

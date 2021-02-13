@@ -2,50 +2,24 @@
 
 Operation::Operation(VariableSet *arg_varSet,vector<QString> arg_operation)//for Arithmetic
 {
-    varSet=arg_varSet;
-    operation=arg_operation;
-    vector<QString> provVariable;
-    checkVarExist(arg_operation[0]);
-    if(arg_operation[1]==OperatorSyntaxEqual){
-        if(arg_operation.size()==2){
-            throw(new Error("expected expression"));
-        }
-        else{
-            bool val=true;
-            for (unsigned int i=2;i<arg_operation.size();i++) {
-                if(val&&!isOperator(arg_operation[i])){
-                    checkVarExist(arg_operation[i]);
-                    val=false;
-                }
-                else if(!val&&isOperator(arg_operation[i])){
-                    val=true;
-                }
-                else{
-                   throw(new Error("expected expression"));
-                }
-            }
-            if(val){
-                throw(new Error("expected expression"));
-            }
-        }
-    }
-
-    task=Task::calculet;
-    //arithmicSetup(arg_VarVec,arg_result ,arg_Op);
-
+    setupCalc(arg_varSet,arg_operation);
+}
+Operation::Operation(VariableSet *arg_varSet,vector<QString> arg_operation, Variable *res){
+    result=res;
+    setupCalc(arg_varSet,arg_operation);
 }
 
 Operation::Operation(VariableSet *arg_varSet,QString arg_name, QString arg_type){
+    VariableType varType;
     Variable::getVariableTypeFromString(arg_type,varType,true);
-    setupDefine(arg_varSet,arg_name,varType);
+    setupDefine(arg_varSet,arg_name,varType,"0");
 }
 Operation::Operation(VariableSet *arg_varSet,QString arg_name, VariableType arg_type){
-    setupDefine(arg_varSet,arg_name,arg_type);
+    setupDefine(arg_varSet,arg_name,arg_type,"0");
 }
 
-Operation::Operation(VariableSet *arg_varSet,QString arg_name, VariableType arg_type,QVariant arg_startValue){
-    startValue=arg_startValue;
-    setupDefine(arg_varSet,arg_name,arg_type);
+Operation::Operation(VariableSet *arg_varSet,QString arg_name, VariableType arg_type,QString arg_startValue){
+    setupDefine(arg_varSet,arg_name,arg_type,arg_startValue);
 }
 Variable* Operation::getResult(){
     return result;
@@ -58,12 +32,33 @@ void Operation::setResultVariable(Variable *arg_var){
 void Operation::exec(){
     switch (task) {
         case Task::defineVariable:
-            varSet->variable.push_back(new Variable(varType,varName,startValue));
+            defineVar->define();
             break;
         case Task::calculet:
+            //result = getVariable(operation[0]);
+            result->setValue(getVariable(varSet,operation[0])->getValuetoInt());
+            Operator op=Operator::none;
+            for(unsigned int i=1;i<operation.size();i++){
+                if(i%2==1){
+                    op=getOperator(operation[i]);
+                }
+                else{
+                    switch(op){
+                        case Operator::plus:
+                          result->setValue(result->getValuetoInt()+getVariable(varSet,operation[i])->getValuetoInt());
+                        break;
+                        case Operator::minus:
+                          result->setValue(result->getValuetoInt()-getVariable(varSet,operation[i])->getValuetoInt());
+                        break;
+                        case Operator::none:
+                            throw(new Error("error Oprator unknown"));
+                    }
+                }
+            }
 
             break;
     }
+
 }
 
 vector<QString> Operation::getOperatorSyntax(){
@@ -85,10 +80,13 @@ bool Operation::isOperator(QString &arg_name){
     return false;
 }
 
-bool Operation::isNumber(QString &arg_string){
-    bool ok;
-    arg_string.toInt(&ok,10);
-    return ok;
+int Operation::getVariableId(VariableSet *arg_varSet, QString arg_name){
+    for(unsigned int i=0;i<arg_varSet->size();i++){
+        if((*arg_varSet)[i]->getName()==arg_name){
+            return int(i);
+        }
+    }
+    return -1;
 }
 
 Operator Operation::getOperator(QString arg_operatorName){
@@ -101,25 +99,75 @@ Operator Operation::getOperator(QString arg_operatorName){
     return Operator::none;
 }
 
-int Operation::getProvVariableId(VariableSet *arg_varSet, QString arg_name){
-    for(unsigned int i=0;i<arg_varSet->names.size();i++){
-        if(arg_varSet->names[i]==arg_name){
-            return int(i);
-        }
-    }
-    return -1;
+bool Operation::isNumber(QString &arg_string){
+    bool ok;
+    arg_string.toInt(&ok,10);
+    return ok;
 }
 
-void Operation::setupDefine(VariableSet *arg_varSet,QString arg_name, VariableType arg_type){
+bool Operation::isVariable(VariableSet *arg_varSet,QString arg_name){
+    for(unsigned long i=0;i<arg_varSet->size();i++){
+        if((*arg_varSet)[i]->getName()==arg_name){
+            return true;
+        }
+    }
+    return false;
+}
+
+Variable* Operation::getVariable(VariableSet *arg_varSet,QString arg_name){
+    int pos;
+    checkVarExist(arg_varSet,arg_name,pos);
+    return (*arg_varSet)[unsigned(pos)];
+}
+void Operation::checkVarExist(VariableSet *arg_varSet,QString arg_name){
+    int x;
+    checkVarExist(arg_varSet,arg_name,x);
+}
+void Operation::checkVarExist(VariableSet *arg_varSet,QString arg_name,int &arg_pos){
+    for(unsigned long i=0;i<arg_varSet->size();i++){
+        if((*arg_varSet)[i]->getName()==arg_name){
+            arg_pos=int(i);
+            return;
+        }
+    }
+    throw(new Error(arg_name+" not defined"));
+}
+void Operation::setupDefine(VariableSet *arg_varSet,QString arg_name, VariableType arg_type,QString arg_startValue){
     varSet=arg_varSet;
     checkIfVarNameFree(arg_name);
-    varName=arg_name;
-    varType=arg_type;
-
-    varSet->names.push_back(varName);
-    varSet->type.push_back(varType);
-
+    defineVar=new Variable(arg_type,arg_name,arg_startValue);
+    varSet->push_back(defineVar);
     task=Task::defineVariable;
+}
+
+void Operation::setupCalc(VariableSet *arg_varSet,vector<QString> arg_operation){
+    varSet=arg_varSet;
+    operation=arg_operation;
+    vector<QString> provVariable;
+
+    if(arg_operation.size()>0){
+        checkVarExist(varSet,arg_operation[0]);
+        bool val=false;
+        for (unsigned int i=1;i<arg_operation.size();i++) {
+            if(val&&!isOperator(arg_operation[i])){
+                checkVarExist(varSet,arg_operation[i]);
+                val=false;
+            }
+            else if(!val&&isOperator(arg_operation[i])){
+                val=true;
+            }
+            else{
+               throw(new Error("expected expression"));
+            }
+        }
+        if(val){
+            throw(new Error("expected expression"));
+        }
+    }
+    else{
+        throw(new Error("expected expression"));
+    }
+    task=Task::calculet;
 }
 
 void Operation::checkLength(vector<QString> &com,unsigned long len){
@@ -144,7 +192,7 @@ void Operation::checkMinMaxLength(vector<QString> &com,unsigned long min,unsigne
 
 void Operation::checkAllVarType(vector<QString> &arg_vec, VariableType arg_typ){
     for(unsigned int i=0;i<arg_vec.size();i++){
-        if(varSet->type[unsigned(getProvVariableId(varSet,arg_vec[i]))]!=arg_typ){
+        if((*varSet)[unsigned(getVariableId(varSet,arg_vec[i]))]->getVariableType()!=arg_typ){
             throw(new Error("not all Argument have the same type"));
         }
     }
@@ -157,17 +205,12 @@ void Operation::checkVarType(Variable* arg_var, VariableType arg_typ){
 }
 
 void Operation::checkIfVarNameFree(QString arg_name){
-    for(unsigned long i=0;i<varSet->names.size();i++){
-        if(varSet->names[i]==arg_name){
+    for(unsigned long i=0;i<varSet->size();i++){
+        if((*varSet)[i]->getName()==arg_name){
             throw(new Error(arg_name+" already exist"));
         }
     }
 }
-void Operation::checkVarExist(QString arg_name){
-    for(unsigned long i=0;i<varSet->names.size();i++){
-        if(varSet->names[i]==arg_name){
-            return;
-        }
-    }
-    throw(new Error(arg_name+" not defined"));
-}
+
+
+

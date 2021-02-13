@@ -1,8 +1,8 @@
 #include "variable.h"
 
-Variable::Variable(VariableType arg_type,QString arg_name,QVariant arg_value){
-    value=&arg_value;
+Variable::Variable(VariableType arg_type,QString arg_name,QString arg_value){
     varSetup(arg_type,arg_name);
+    setValue(arg_value);
 }
 
 Variable::Variable(VariableType arg_type,QString arg_name)
@@ -11,12 +11,12 @@ Variable::Variable(VariableType arg_type,QString arg_name)
 }
 
 void Variable::setValue(QString arg_value){
-
     try {
+        value=arg_value;
         switch (type) {
             case integer:
-                checkNumber(arg_value);
-                value=new QVariant(arg_value.toInt());
+                checkNumber(value);
+
         }
     }
     catch(Error *er){
@@ -25,11 +25,22 @@ void Variable::setValue(QString arg_value){
 }
 
 void Variable::setValue(int arg_value){
-    value=new QVariant(arg_value);
+    value=QString::number(arg_value);
 }
 
+void Variable::define(){
+    defined=true;
+}
+
+
+
 int Variable::getValuetoInt(){
-    return value->toInt();
+       return value.toInt();
+    /*}
+    else{
+        qDebug()<<name<<" not defined";
+        return -1;
+    }*/
 }
 
 QString Variable::getName(){
@@ -62,6 +73,12 @@ void Variable::getVariableTypeFromString(QString arg_name, VariableType &var_Typ
     if(errorMessage){
         throw(new Error(arg_name +" is no Varible Type"));
     }
+}
+
+vector<QString> Variable::getVariableTypeSyntax(){
+    vector<QString> ret;
+    ret.push_back(VariableSyntaxInteger);
+    return ret;
 }
 
 void Variable::varSetup(VariableType arg_type,QString arg_name){

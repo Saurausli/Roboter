@@ -42,7 +42,9 @@ QVector<QString> ConsoleUi::getErrorMessageVec(){
    }
    return vec;
 }
-
+QVector<QString> ConsoleUi::getVariableTypWords(){
+    return QVector<QString>::fromStdVector(Variable::getVariableTypeSyntax());
+}
 /*
 void ConsoleUi::tryCommand(QString programm){
     if(checkProgramm(programm)){

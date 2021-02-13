@@ -23,7 +23,7 @@ signals:
 public slots:
     QVector<int> getErrorLineVec();
     QVector<QString> getErrorMessageVec();
-
+    QVector<QString> getVariableTypWords();
     /*void tryCommand(QString programm);
     void loopCommand(QString programm);
     void stopLoop();

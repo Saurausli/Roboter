@@ -16,6 +16,7 @@ SOURCES += \
         main.cpp \
         operation.cpp \
         programm.cpp \
+        suboperation.cpp \
         variable.cpp
 
 HEADERS += \
@@ -26,6 +27,7 @@ HEADERS += \
     joint.h \
     operation.h \
     programm.h \
+    suboperation.h \
     variable.h
 
 RESOURCES += \

@@ -31,7 +31,7 @@ public:
     void startProgramm();*/
     void compileProgram(QString arg_program);
     static vector<QString> split(QString _str, char delimiter);
-    bool checkNameIsVariable(QString arg_name);
+
 signals:
     void newRespond(QString output);
     void newRunningProgram(QString programm);
@@ -42,7 +42,7 @@ protected:
     ErrorList *errorList;
 private:
     VariableSet *varSet;
-    vector<Operation*> operationArray;
+    vector<Operation> operationArray;
 
     /*
 x = 1
