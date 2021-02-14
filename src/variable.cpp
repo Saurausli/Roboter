@@ -52,6 +52,7 @@ VariableType Variable::getVariableType(){
 }
 
 bool Variable::checkIfIsVariableType(QString arg_type){
+
     VariableType varType;
     getVariableTypeFromString(arg_type,varType);
     return varType!=VariableType::unknown;
@@ -83,6 +84,9 @@ vector<QString> Variable::getVariableTypeSyntax(){
 }
 
 void Variable::varSetup(VariableType arg_type,QString arg_name){
+    if(arg_name.size()>150){
+       throw(new Error("Variable name to long"));
+    }
     type=arg_type;
     name=arg_name;
 }

@@ -148,6 +148,9 @@ Window {
                 target: Backend
                 onNewOutput:{
                     textOutput.text+="\n"+output
+                    if(textOutput.height>flick.height){
+                        flick.contentY=textOutput.height-flick.height;
+                    }
                 }
             }
         }

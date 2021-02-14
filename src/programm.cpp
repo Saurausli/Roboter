@@ -111,6 +111,7 @@ void Programm::compileProgram(QString arg_program){
                      }
                      operationArray.push_back(Operation(varSet,stringProgram[i][1],stringProgram[i][0]));
                 }
+                SubOperation::checkVarExist(varSet,stringProgram[i][startPos]);
                 //check for Operations
                 if(stringProgram[i].size()>startPos+1){
                     if(stringProgram[i][startPos+1]==OperatorSyntaxEqual){

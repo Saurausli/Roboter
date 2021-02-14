@@ -20,6 +20,7 @@ class Variable
 {
 public:
     Variable(VariableType arg_type,QString arg_name,QString arg_value);
+    //Variable(VariableType arg_type,QString arg_name,QString arg_value);
     Variable(VariableType arg_type,QString arg_name);
     void setValue(QString arg_value);
     void setValue(int arg_value);
@@ -36,6 +37,7 @@ private:
     VariableType type;
     QString name;
     bool defined;
+    bool writeable;
     void varSetup(VariableType arg_type,QString arg_name);
 };
 

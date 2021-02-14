@@ -417,16 +417,19 @@ Rectangle{
     function ensureVisible(re){
         if(!lockBar){
             var visibleLines
-            visibleLines=Math.floor(textflick.height/fontMetrics.height)
+            visibleLines=Math.floor(textflick.height/fontMetrics.height)+1
 
             var firstVisibleLine
-            firstVisibleLine =Math.floor((textflick.contentY/fontMetrics.height)+1)
+            firstVisibleLine =Math.floor(textflick.contentY/fontMetrics.height)
+            console.debug(textEditInput.cursorLine,firstVisibleLine,visibleLines)
             if(textEditInput.cursorLine>=firstVisibleLine+visibleLines){
-                textflick.contentY=textEditInput.cursorLine*fontMetrics.height
+                textflick.contentY=(textEditInput.cursorLine-visibleLines+1)*fontMetrics.height
+                console.debug("down")
             }
 
-            else if(textEditInput.cursorLine<firstVisibleLine){
+            else if(textEditInput.cursorLine<=firstVisibleLine+1){
                 textflick.contentY=(textEditInput.cursorLine-1)*fontMetrics.height
+                console.debug("up")
             }
 
             if(re.x>textflick.width+textflick.contentX){
