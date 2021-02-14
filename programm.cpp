@@ -35,17 +35,19 @@ void Programm::compileProgram(QString arg_program){
         }
         QString prov;
         prov=OperatorSyntaxEqual;
-        prov+=" ";
+        prov+="  ";
         prov+=OperatorSyntaxMinus;
         QString prov1;
         prov1=prov+" ";
         arg_program.replace(prov1,prov);
+        qDebug()<<prov1<<" replace with "<<prov;
 
         prov=subOperationBeginSyntax;
-        prov+=" ";
+        prov+="  ";
         prov+=OperatorSyntaxMinus;
         prov1=prov+" ";
         arg_program.replace(prov1,prov);
+        qDebug()<<arg_program;
         // stringProgram[line][word]
 
         vector<vector<QString>> stringProgram;
