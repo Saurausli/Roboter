@@ -33,14 +33,15 @@ public:
     static vector<QString> split(QString _str, char delimiter);
 
 signals:
-    void newRespond(QString output);
+    void newOutput(QString output);
     void newRunningProgram(QString programm);
-    void newRunningCommand(int commandLine);
     void errorOccured();
     void programmFinished();
+    void newRunningCommand();
 protected:
     ErrorList *errorList;
 private:
+    void print(QString arg_print);
     VariableSet *varSet;
     vector<Operation> operationArray;
 

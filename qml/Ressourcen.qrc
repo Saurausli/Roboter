@@ -1,7 +1,8 @@
 <RCC>
     <qresource prefix="/">
-        <file>main.qml</file>
         <file>Editor.qml</file>
         <file>HighLightLine.qml</file>
+        <file>template/DarkButton.qml</file>
+        <file>main.qml</file>
     </qresource>
 </RCC>

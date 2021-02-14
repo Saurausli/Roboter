@@ -1,5 +1,4 @@
 #include <iostream>
-#include <command.h>
 #include <QApplication>
 #include "consoleui.h"
 #define ARDUINOVERSION

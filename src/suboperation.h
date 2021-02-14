@@ -6,6 +6,8 @@
 
 #define OperatorSyntaxPlus "+"
 #define OperatorSyntaxMinus "-"
+#define OperatorSyntaxMultiply  "*"
+#define OperatorSyntaxDivide "/"
 
 #define OperatorSyntaxEqual "="
 
@@ -19,6 +21,8 @@ enum Operator{
     none,
     plus,
     minus,
+    multiply,
+    divide
 };
 class SubOperation;
 

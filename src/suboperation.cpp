@@ -32,6 +32,12 @@ void SubOperation::exec(){
                     case Operator::minus:
                       result->setValue(result->getValuetoInt()-getVariable(varSet,operation[i])->getValuetoInt());
                     break;
+                    case Operator::multiply:
+                        result->setValue(result->getValuetoInt()*getVariable(varSet,operation[i])->getValuetoInt());
+                    break;
+                    case Operator::divide:
+                        result->setValue(result->getValuetoInt()/getVariable(varSet,operation[i])->getValuetoInt());
+                    break;
                     case Operator::none:
                         throw(new Error("error Operator unknown"));
                 }
@@ -48,6 +54,8 @@ vector<QString> SubOperation::getOperatorSyntax(){
     opVec.push_back(OperatorSyntaxPlus);
     opVec.push_back(OperatorSyntaxMinus);
     opVec.push_back(OperatorSyntaxEqual);
+    opVec.push_back(OperatorSyntaxMultiply);
+    opVec.push_back(OperatorSyntaxDivide);
     opVec.push_back(subOperationEndSyntax);
     opVec.push_back(subOperationBeginSyntax);
     return opVec;
@@ -79,6 +87,12 @@ Operator SubOperation::getOperator(QString arg_operatorName){
     }
     if(arg_operatorName==OperatorSyntaxMinus){
         return Operator::minus;
+    }
+    if(arg_operatorName==OperatorSyntaxMultiply){
+        return Operator::multiply;
+    }
+    if(arg_operatorName==OperatorSyntaxDivide){
+        return Operator::divide;
     }
     return Operator::none;
 }
