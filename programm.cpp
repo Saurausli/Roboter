@@ -29,7 +29,7 @@ void Programm::compileProgram(QString arg_program){
 
         //make sure Operatorchar are clearly seperated
         vector<QString> findStr;
-        findStr=Operation::getOperatorSyntax();
+        findStr=SubOperation::getOperatorSyntax();
         for(unsigned int i=0;i<findStr.size();i++){
             arg_program.replace(findStr[i]," "+findStr[i]+" ");
         }
@@ -38,6 +38,12 @@ void Programm::compileProgram(QString arg_program){
         prov+=" ";
         prov+=OperatorSyntaxMinus;
         QString prov1;
+        prov1=prov+" ";
+        arg_program.replace(prov1,prov);
+
+        prov=subOperationBeginSyntax;
+        prov+=" ";
+        prov+=OperatorSyntaxMinus;
         prov1=prov+" ";
         arg_program.replace(prov1,prov);
         // stringProgram[line][word]
@@ -59,7 +65,7 @@ void Programm::compileProgram(QString arg_program){
         for(unsigned int i=0;i<stringProgram.size();i++){
             try{
                 for(unsigned int j=0;j<stringProgram[i].size();j++){
-                    if(Operation::isNumber(stringProgram[i][j])){
+                    if(SubOperation::isNumber(stringProgram[i][j])){
                         Operation op(varSet,"#int_"+stringProgram[i][j],VariableType::integer,stringProgram[i][j]);
                         operationArray.push_back(op);
                         unsigned int y;
@@ -106,7 +112,7 @@ void Programm::compileProgram(QString arg_program){
                 if(stringProgram[i].size()>startPos+1){
                     if(stringProgram[i][startPos+1]==OperatorSyntaxEqual){
                         vector<QString> operatorVec(&stringProgram[i][startPos+2],&stringProgram[i][stringProgram[i].size()]);
-                        operationArray.push_back(Operation(varSet,operatorVec,Operation::getVariable(varSet,stringProgram[i][startPos])));
+                        operationArray.push_back(Operation(varSet,operatorVec,SubOperation::getVariable(varSet,stringProgram[i][startPos])));
                     }
                 }
             }
@@ -122,15 +128,26 @@ void Programm::compileProgram(QString arg_program){
         errorList->push_back(er);
     }
     //execute Program
-    qDebug()<<"\n------------------------Start Program------------------------\n";
+
     if(errorList->size()==0){
+        qDebug()<<"\n------------------------Start Program------------------------\n";
         for(unsigned long i=0;i<operationArray.size();i++){
             operationArray[i].exec();
             }
+        qDebug()<<"\n-------------------------End Program-------------------------\n";
+        qDebug()<<"\n-----------------------System Variable-----------------------\n";
         for(int i=0;i<varSet->size();i++){
-        qDebug()<<(*varSet)[i]->getName()<<" = "<<(*varSet)[i]->getValuetoInt();}
+            if((*varSet)[i]->getName().left(1)=="#")
+                qDebug()<<(*varSet)[i]->getName()<<" = "<<(*varSet)[i]->getValuetoInt();
+        }
+        qDebug()<<"\n------------------------User Variable------------------------\n";
+        for(int i=0;i<varSet->size();i++){
+            if((*varSet)[i]->getName().left(1)!="#")
+                qDebug()<<(*varSet)[i]->getName()<<" = "<<(*varSet)[i]->getValuetoInt();
+        }
     }
     else{
+        qDebug()<<"\n------------------------Error Occured------------------------\n";
         emit errorOccured();
     }
     qDebug()<<"\n-------------------------End Program-------------------------\n";

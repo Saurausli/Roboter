@@ -8,6 +8,7 @@ Variable::Variable(VariableType arg_type,QString arg_name,QString arg_value){
 Variable::Variable(VariableType arg_type,QString arg_name)
 {
     varSetup(arg_type,arg_name);
+    setValue(0);
 }
 
 void Variable::setValue(QString arg_value){

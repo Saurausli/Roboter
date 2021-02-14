@@ -2,27 +2,22 @@
 #define OPERATION_H
 
 #include <QObject>
-#include "variable.h"
+
 #include <vector>
 #include <iostream>
+#include "suboperation.h"
 
 
-#define OperatorSyntaxPlus "+"
-#define OperatorSyntaxMinus "-"
 
-#define OperatorSyntaxEqual "="
-
-using namespace std;
+struct subOperationStruct{
+    int start=-1;
+    int end=-1;
+    vector<QString> op;
+};
 
 enum Task{
     defineVariable,
     calculet
-};
-
-enum Operator{
-    none,
-    plus,
-    minus,
 };
 
 class Operation
@@ -37,15 +32,7 @@ public:
     void exec();
     Variable* getResult();
     void setResultVariable(Variable *arg_var);
-    static vector<QString> getOperatorSyntax();
-    static Operator getOperator(QString arg_operatorName);
-    static int getVariableId(VariableSet *arg_varSet, QString arg_name);
-    static bool isOperator(QString &arg_name);
-    static bool isNumber(QString &arg_string);
-    static bool isVariable(VariableSet *arg_varSet,QString arg_name);
-    static Variable* getVariable(VariableSet *arg_varSet,QString arg_name);
-    static void checkVarExist(VariableSet *arg_varSet,QString arg_name);
-    static void checkVarExist(VariableSet *arg_varSet,QString arg_name,int &arg_pos);
+
 private:
     //void arithmicSetup(vector<Variable*> arg_VarVec,Variable* arg_result ,Operator arg_Op);
     void setupDefine(VariableSet *arg_varSet,QString arg_name, VariableType arg_type,QString arg_startValue);
@@ -61,15 +48,13 @@ private:
     void checkIfVarNameFree(QString arg_name);
 
 
-
-
     VariableSet *varSet;
     Task task;
 
     Variable *defineVar;
-
     vector<QString> operation;
     Variable *result;
+    SubOperationList subOpList;
 };
 
 #endif // OPERATION_H
