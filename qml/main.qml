@@ -78,6 +78,18 @@ Window {
             anchors.fill: parent
             spacing: 10
             layoutDirection : Qt.RightToLeft
+            TabBar{
+                TabButton{
+                    id:problems
+                    text: "problems"
+
+                }
+                TabButton{
+                    id:general
+                    text: "general"
+
+                }
+            }
             DarkButton{
                 text: "hide"
                 onClicked: {
@@ -118,6 +130,8 @@ Window {
 
         }
     }
+
+
     Flickable{
         id:flick
         anchors.left: parent.left
@@ -137,10 +151,14 @@ Window {
                 policy: ScrollBar.AlwaysOn
                 visible: flick.width<textOutput.width
             }
+        ErrorLine{
+            visible: problems.checked
+        }
+
         Text {
             id: textOutput
             clip: true
-
+            visible: general.checked
             text: qsTr("")
             font.pixelSize: 15
             color: "white"
