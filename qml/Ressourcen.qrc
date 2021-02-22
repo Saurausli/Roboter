@@ -4,5 +4,6 @@
         <file>HighLightLine.qml</file>
         <file>template/DarkButton.qml</file>
         <file>main.qml</file>
+        <file>ErrorLine.qml</file>
     </qresource>
 </RCC>
