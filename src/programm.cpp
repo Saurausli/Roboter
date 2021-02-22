@@ -173,7 +173,7 @@ vector<QString> Programm::split(QString _str, char delimiter) {
 
 void Programm::print(QString arg_print){
     emit newOutput(arg_print);
-    qDebug()<<arg_print;
+    //qDebug()<<arg_print;
 }
 
 /*

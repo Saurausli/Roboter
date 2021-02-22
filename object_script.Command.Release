@@ -9,9 +9,12 @@ release/programm.o
 release/suboperation.o
 release/variable.o
 release/qml_Editor_qml.o
+release/qml_ErrorLine_qml.o
 release/qml_HighLightLine_qml.o
 release/qml_main_qml.o
 release/qml_template_DarkButton_qml.o
+release/qml_template_DarkTabButton_qml.o
+release/qml_template_StandartFlick_qml.o
 release/qmlcache_loader.o
 release/moc_command.o
 release/moc_consoleui.o

@@ -5,5 +5,7 @@
         <file>template/DarkButton.qml</file>
         <file>main.qml</file>
         <file>ErrorLine.qml</file>
+        <file>template/DarkTabButton.qml</file>
+        <file>template/StandartFlick.qml</file>
     </qresource>
 </RCC>

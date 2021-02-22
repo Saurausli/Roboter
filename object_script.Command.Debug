@@ -9,9 +9,12 @@ debug/programm.o
 debug/suboperation.o
 debug/variable.o
 debug/qml_Editor_qml.o
+debug/qml_ErrorLine_qml.o
 debug/qml_HighLightLine_qml.o
 debug/qml_main_qml.o
 debug/qml_template_DarkButton_qml.o
+debug/qml_template_DarkTabButton_qml.o
+debug/qml_template_StandartFlick_qml.o
 debug/qmlcache_loader.o
 debug/moc_command.o
 debug/moc_consoleui.o

@@ -1,7 +1,10 @@
 import QtQuick 2.10
 import QtQuick.Controls 2.4
 import QtQuick.Window 2.10
+//import QtQuick.Layouts 2.4
 import "template/"
+import QtQuick.Layouts 1.3
+import "template"
 Window {
     id:window
     width: 800
@@ -70,7 +73,7 @@ Window {
     Rectangle{
         id:respondsButtons
         height: 20
-        anchors.bottom: flick.top
+        anchors.bottom: bottomBar.top
         anchors.left: parent.left
         anchors.right: parent.right
         color: "#232323"
@@ -78,27 +81,15 @@ Window {
             anchors.fill: parent
             spacing: 10
             layoutDirection : Qt.RightToLeft
-            TabBar{
-                TabButton{
-                    id:problems
-                    text: "problems"
-
-                }
-                TabButton{
-                    id:general
-                    text: "general"
-
-                }
-            }
             DarkButton{
                 text: "hide"
                 onClicked: {
                     if(text=="hide"){
-                        flick.height=0
+                        bottomBar.visible=false
                         text="show"
                     }
                     else{
-                        flick.height=150
+                        bottomBar.visible=true
                         text="hide"
                     }
 
@@ -132,49 +123,69 @@ Window {
     }
 
 
-    Flickable{
-        id:flick
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.bottom: parent.bottom
-        anchors.margins: 20
-        height: 250
-        clip: true
 
-        contentHeight: textOutput.height>150 ? textOutput.height:150
-        ScrollBar.horizontal: ScrollBar {
-                parent: flick.parent
-                anchors.top: flick.bottom
-                anchors.left: flick.left
-                anchors.right: flick.right
-                orientation: Qt.Horizontal
-                policy: ScrollBar.AlwaysOn
-                visible: flick.width<textOutput.width
-            }
-        ErrorLine{
-            visible: problems.checked
-        }
-
-        Text {
-            id: textOutput
-            clip: true
-            visible: general.checked
-            text: qsTr("")
-            font.pixelSize: 15
-            color: "white"
+        StackLayout{
+            id:bottomBar
+            currentIndex: bottomBarTabBar.currentIndex
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.bottom: bottomBarTabBar.top
+            anchors.margins: 20
+            height: 250
+            anchors.bottomMargin: 0
+            property variant error: []
+            property variant errorMessage: []
             Connections{
                 target: Backend
-                onNewOutput:{
-                    textOutput.text+="\n"+output
-                    if(textOutput.height>flick.height){
-                        flick.contentY=textOutput.height-flick.height;
+                onErrorOccured:{
+                    bottomBar.errorMessage=Backend.getErrorMessageVec()
+                    bottomBar.error=Backend.getErrorLineVec();
+
+                }
+            }
+            StandartFlick{
+                id:generalFlick
+                contentHeight: textOutput.height>bottomBar.height ? textOutput.height:bottomBar.height
+                Text {
+                    id: textOutput
+                    clip: true
+                    text: qsTr("")
+                    font.pixelSize: 15
+                    color: "white"
+                    Connections{
+                        target: Backend
+                        onNewOutput:{
+                            textOutput.text+="\n"+output
+                            if(textOutput.height>bottomBar.height){
+                                generalFlick.contentY=generalFlick.height-bottomBar.height;
+                            }
+                        }
                     }
                 }
             }
+        StandartFlick{
+            contentHeight: errorColmn.height>bottomBar.height ? errorColmn.height:bottomBar.height
+            Column{
+                id:errorColmn
+                property int errorHeight: 25
+                Repeater{
+                    id:errorList
+                    model:bottomBar.error.length
+
+                    ErrorLine{
+                        id:errorLine
+                        //x:0
+                        //y:height*index
+                        height: errorColmn.errorHeight
+                        width: bottomBar.width
+                        errorLine: bottomBar.error[index]
+                        errorText: bottomBar.errorMessage[index]
+                    }
+                }
+                height: bottomBar.error.length*errorHeight
+            }
         }
-    }
-
-
+        }
     Connections{
         target: Backend
         onErrorOccured:{
@@ -184,6 +195,32 @@ Window {
             textInput.programmRunning=false
         }
     }
+        TabBar{
+            id:bottomBarTabBar
+            anchors.bottom: parent.bottom
+            anchors.left: parent.left
+            anchors.right: parent.right
+            height: 20
+            currentIndex: 0
+            background: Rectangle {
+                    color: "#232323"
+                }
+            DarkTabButton{
+                id:general
+                text: "general"
+                height: 20
+                anchors.top: parent.top
+                width: 100
+                //Component.on
+            }
+            DarkTabButton{
+                id:problems
+                text: "problems"
+                height: 20
+                anchors.top: parent.top
+                width: 100
+            }
+
+        }
+
 }
-
-
