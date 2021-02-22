@@ -2,7 +2,7 @@
 
 Operation::Operation(VariableSet *arg_varSet,vector<QString> arg_operation)//for Arithmetic
 {
-    result=new Variable(VariableType::integer,"res");
+    result=new Variable(subOpList[subOpList.size()-1]->getResult()->getVariableType(),"res");
     setupCalc(arg_varSet,arg_operation);
 }
 Operation::Operation(VariableSet *arg_varSet,vector<QString> arg_operation, Variable *res){

@@ -6,7 +6,7 @@ SubOperation::SubOperation(VariableSet *arg_varSet,vector<QString> arg_subOperat
     while(isVariable(arg_varSet,"#res_"+QString::number(id))){
         id++;
     }
-    result=new Variable(VariableType::integer,"#res_"+QString::number(id));
+    result=new Variable(VariableType::Integer,"#res_"+QString::number(id));
     arg_varSet->push_back(result);
     setupCalc(arg_varSet,arg_subOperation);
 }
@@ -58,6 +58,8 @@ vector<QString> SubOperation::getOperatorSyntax(){
     opVec.push_back(OperatorSyntaxDivide);
     opVec.push_back(subOperationEndSyntax);
     opVec.push_back(subOperationBeginSyntax);
+    opVec.push_back(OperatorSyntaxAND);
+    opVec.push_back(OperatorSyntaxOR);
     return opVec;
 }
 
@@ -93,6 +95,12 @@ Operator SubOperation::getOperator(QString arg_operatorName){
     }
     if(arg_operatorName==OperatorSyntaxDivide){
         return Operator::divide;
+    }
+    if(arg_operatorName==OperatorSyntaxAND){
+        return Operator::andBin;
+    }
+    if(arg_operatorName==OperatorSyntaxOR){
+        return Operator::orBin;
     }
     return Operator::none;
 }
@@ -131,6 +139,16 @@ void SubOperation::checkVarExist(VariableSet *arg_varSet,QString arg_name,int &a
     throw(new Error(arg_name+" not defined"));
 }
 
+void SubOperation::checkVarTypFromOp(Variable *arg_var,Operator arg_op){
+    if((arg_op==Operator::plus||arg_op==Operator::minus||arg_op==Operator::multiply||arg_op==Operator::divide)&&arg_var->getVariableType()==VariableType::Integer){
+        return;
+    }
+    if((arg_op==Operator::andBin||arg_op==Operator::orBin)&&arg_var->getVariableType()==VariableType::Boolean){
+        return;
+    }
+    throw(new Error("incompatible operator"));
+    return;
+}
 
 void SubOperation::setupCalc(VariableSet *arg_varSet,vector<QString> arg_operation){
 
@@ -145,12 +163,15 @@ void SubOperation::setupCalc(VariableSet *arg_varSet,vector<QString> arg_operati
     if(arg_operation.size()>0){
         SubOperation::checkVarExist(varSet,arg_operation[0]);
         bool val=false;
+
         for (unsigned int i=1;i<arg_operation.size();i++) {
             if(val&&!SubOperation::isOperator(arg_operation[i])){
                 SubOperation::checkVarExist(varSet,arg_operation[i]);
+                SubOperation::checkVarTypFromOp(getVariable(varSet,arg_operation[i]),getOperator(arg_operation[i-1]));
                 val=false;
             }
             else if(!val&&isOperator(arg_operation[i])){
+                SubOperation::checkVarTypFromOp(getVariable(varSet,arg_operation[i-1]),getOperator(arg_operation[i]));
                 val=true;
             }
             else{

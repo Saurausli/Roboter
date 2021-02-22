@@ -6,6 +6,10 @@
 #include "error.h"
 
 #define VariableSyntaxInteger "int"
+#define VariableSyntaxBool "bool"
+
+#define BoolValueTrue "true"
+#define BoolValueFalse "false"
 
 class Variable;
 
@@ -13,7 +17,8 @@ typedef std::vector<Variable*> VariableSet;
 
 enum VariableType{
     unknown,
-    integer
+    Integer,
+    Boolean,
 };
 
 class Variable
@@ -24,14 +29,18 @@ public:
     Variable(VariableType arg_type,QString arg_name);
     void setValue(QString arg_value);
     void setValue(int arg_value);
+    void setType(VariableType arg_type);
     void define();
     int getValuetoInt();
+    bool getValuetoBool();
     QString getName();
     VariableType getVariableType();
     static bool checkIfIsVariableType(QString arg_type);
     static void checkNumber(QString number);
     static void getVariableTypeFromString(QString arg_name, VariableType &var_Type,bool errorMessage=false);
     static vector<QString> getVariableTypeSyntax();
+    static bool toBool(QString arg_value);
+    static void checkBool(QString arg_value);
 private:
     QString value;
     VariableType type;

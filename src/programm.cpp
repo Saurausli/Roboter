@@ -66,7 +66,7 @@ void Programm::compileProgram(QString arg_program){
             try{
                 for(unsigned int j=0;j<stringProgram[i].size();j++){
                     if(SubOperation::isNumber(stringProgram[i][j])){
-                        Operation op(varSet,"#int_"+stringProgram[i][j],VariableType::integer,stringProgram[i][j]);
+                        Operation op(varSet,"#int_"+stringProgram[i][j],VariableType::Integer,stringProgram[i][j]);
                         operationArray.push_back(op);
                         unsigned int y;
                         y=j+1;

@@ -9,6 +9,9 @@
 #define OperatorSyntaxMultiply  "*"
 #define OperatorSyntaxDivide "/"
 
+#define OperatorSyntaxAND "&&"
+#define OperatorSyntaxOR "||"
+
 #define OperatorSyntaxEqual "="
 
 #define subOperationBeginSyntax "("
@@ -22,8 +25,11 @@ enum Operator{
     plus,
     minus,
     multiply,
-    divide
+    divide,
+    andBin,
+    orBin,
 };
+
 class SubOperation;
 
 typedef std::vector<SubOperation*> SubOperationList;
@@ -47,6 +53,7 @@ public:
     static Variable* getVariable(VariableSet *arg_varSet,QString arg_name);
     static void checkVarExist(VariableSet *arg_varSet,QString arg_name);
     static void checkVarExist(VariableSet *arg_varSet,QString arg_name,int &arg_pos);
+    static void checkVarTypFromOp(Variable *arg_var,Operator arg_op);
 
 private:
     void setupCalc(VariableSet *arg_varSet,vector<QString> arg_operation);

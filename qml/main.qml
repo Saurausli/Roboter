@@ -124,7 +124,7 @@ Window {
         anchors.right: parent.right
         anchors.bottom: parent.bottom
         anchors.margins: 20
-        height: 150
+        height: 250
         clip: true
 
         contentHeight: textOutput.height>150 ? textOutput.height:150
