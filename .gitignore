@@ -1,3 +1,11 @@
 *.user*
 Release/
 *.autosave
+*.stash
+.txt
+bin/
+release/
+debug/
+*.Debug
+*.Release
+*.txt

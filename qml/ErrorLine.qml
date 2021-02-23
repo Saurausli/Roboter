@@ -1,10 +1,12 @@
 import QtQuick 2.0
 
-Item {
+Rectangle {
     id: element
     height: 25
     property int errorLine
     property string errorText
+    signal clicked
+    color: mouseArea.pressed ? "#265f99":"transparent"
     Row{
         id:textrow
         anchors.leftMargin: 5
@@ -41,11 +43,17 @@ Item {
             //anchors.verticalCenter: parent.verticalCenter
         }
 
-    }/*
+    }
     MouseArea{
+        id:mouseArea
         anchors.leftMargin: 0
         anchors.fill: parent
-    }*/
+        onDoubleClicked: {
+            textInput.showLine(errorLine)
+            clicked
+
+        }
+    }
     Rectangle{
         id:bottomLine
         height: 1

@@ -437,6 +437,18 @@ Rectangle{
             }
         }
      }
+    function showLine(line){
+        var visibleLines
+        var provContent=(line*fontMetrics.height)-textflick.height/2
+        if(provContent<0){
+            provContent=0
+        }
+        else if(provContent>textEditInput.height-textflick.height){
+            provContent=textEditInput.height-textflick.height
+        }
+        console.debug(provContent)
+        textflick.contentY=provContent;
+    }
 }
 
 

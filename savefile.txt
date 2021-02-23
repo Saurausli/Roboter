@@ -1,9 +1,35 @@
 int x=12
-int y=3
+int 
 int k=
 int w=
-int s=+
-d
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+int 
 fe
 g
 g
