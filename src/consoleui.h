@@ -24,6 +24,7 @@ public slots:
     QVector<int> getErrorLineVec();
     QVector<QString> getErrorMessageVec();
     QVector<QString> getVariableTypWords();
+    QString colorIn(QString arg_line);
     /*void tryCommand(QString programm);
     void loopCommand(QString programm);
     void stopLoop();
@@ -32,6 +33,7 @@ public slots:
 private:
     QQmlApplicationEngine *engine;
     QQmlContext* context;
+    void colorKeyWord(QString& arg_line,vector<QString> arg_keywords,QString arg_color);
 };
 
 #endif // CONSOLEUI_H
