@@ -174,6 +174,7 @@ Rectangle{
 
             property int prevLinCount: 0
             onLengthChanged: {
+
                 if(!lockBar&&length!=lengthPrevious){
                     lengthPrevious=length;
                     if(lineCount-prevLinCount>1){
@@ -182,8 +183,10 @@ Rectangle{
                         }
                     }
                     prevLinCount=lineCount
-                    displayColorLine(cursorLine);
+                    displayColorLine(cursorLine)
+
                 }
+
             }
             MouseArea{
                 anchors.fill:parent
@@ -299,12 +302,17 @@ Rectangle{
 
         string=toRichText(string)
         textEditInput.remove(0,textEditInput.length)
-        textEditInput.insert(0,string)
+        textEditInput.insert(0,"<pre>"+string+"</pre>")
+        textProv=textEditInput.getFormattedText(0,textEditInput.length)
+        textProv=textProv.replace("white-space: pre-wrap","white-space: pre")
+        textEditInput.text=textProv
 
         lockBar=false
         displayColorTextAll()
+
         textEditInput.cursorPosition=cursorPos
         ensureVisible(textEditInput.cursorRectangle)
+        console.debug(textEditInput.text)
     }
 
     function toRichText(string){
@@ -321,7 +329,7 @@ Rectangle{
         newString=toRichText(newString)
         textEditInput.remove(start,end)
         //console.debug(start,newString)
-        textEditInput.insert(start,newString)
+        textEditInput.insert(start,+newString)
         textEditInput.cursorPosition=cursorPos
         lockBar=false
     }
@@ -332,31 +340,45 @@ Rectangle{
     }
 
     function displayColorLine(line){
+
         var start;
         var end;
         start=textEditInput.positionAt(0,line*fontMetrics.height-(fontMetrics.height/2))
         end=textEditInput.positionAt(textEditInput.width,line*fontMetrics.height-(fontMetrics.height/2))
+
         textProv=textEditInput.getText(start,end)
 
         displayColorText()/*
         if(line==1){
             textProv="<pre>"+textProv
         }*/
+
         if(line==textEditInput.lineCount){
            // textProv=textProv+"</pre>"
         }
+
         lockBar=true
+
         var cursorPos
         cursorPos=textEditInput.cursorPosition
         textProv=toRichText(textProv)
+
+
         textEditInput.remove(start,end)
         textEditInput.insert(start,"<pre>"+textProv+"</pre>")
-        textProv=textEditInput.getFormattedText(0,textEditInput.length)
+
+    /*    textProv=textEditInput.getFormattedText(0,textEditInput.length)
+
         textProv=textProv.replace("white-space: pre-wrap","white-space: pre")
+
         //console.debug(textProv)
         textEditInput.text=textProv
+        var t0= new Date().getTime();
         textEditInput.cursorPosition=cursorPos
+        console.debug(new Date().getTime()-t0)
+        console.debug(textEditInput.text)*/
         lockBar=false
+
     }
 
     function displayColorText(){

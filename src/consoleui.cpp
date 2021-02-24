@@ -48,11 +48,11 @@ QVector<QString> ConsoleUi::getVariableTypWords(){
 
 QString ConsoleUi::colorIn(QString arg_line){
     arg_line=" "+arg_line+" ";
-    vector<QString> keywords=getVariableTypWords();
-    colorKeyWord(arg_line,keywords,"#d69aa7")
+    vector<QString> keywords=Variable::getVariableTypeSyntax();
+    colorKeyWord(arg_line,keywords,"#d69aa7");
 }
 
-void ConsoleUi::colorKeyWord(QString& arg_line,QVector<QString>& arg_keywords,QString& arg_color){
+void ConsoleUi::colorKeyWord(QString& arg_line,vector<QString> arg_keywords,QString arg_color){
 
 }
 /*
