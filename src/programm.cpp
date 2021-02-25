@@ -14,7 +14,10 @@ Programm::~Programm(){
 }
 void Programm::compileProgram(QString arg_program){
     try {
+
         print("\n----------------------Start Preparation----------------------\n");
+        comList.clear();
+        comList.shrink_to_fit();
         varSet = new VariableSet;
         errorList = new ErrorList;
         ////---------------------------------------------------------------------------------////
@@ -29,7 +32,7 @@ void Programm::compileProgram(QString arg_program){
 
         //make sure Operatorchar are clearly seperated
         vector<QString> findStr;
-        findStr=SubOperation::getOperatorSyntax();
+        findStr=Operation::getOperatorSyntax();
         for(unsigned int i=0;i<findStr.size();i++){
             arg_program.replace(findStr[i]," "+findStr[i]+" ");
         }
@@ -41,7 +44,7 @@ void Programm::compileProgram(QString arg_program){
         prov1=prov+" ";
         arg_program.replace(prov1,prov);
 
-        prov=subOperationBeginSyntax;
+        prov=OperationBeginSyntax;
         prov+="  ";
         prov+=OperatorSyntaxMinus;
         prov1=prov+" ";
@@ -65,9 +68,8 @@ void Programm::compileProgram(QString arg_program){
         for(unsigned int i=0;i<stringProgram.size();i++){
             try{
                 for(unsigned int j=0;j<stringProgram[i].size();j++){
-                    if(SubOperation::isNumber(stringProgram[i][j])){
-                        Operation op(varSet,"#int_"+stringProgram[i][j],VariableType::Integer,stringProgram[i][j]);
-                        operationArray.push_back(op);
+                    if(Operation::isNumber(stringProgram[i][j])){
+                        varSet->push_back(new Variable(VariableType::Integer,"#int_"+stringProgram[i][j],stringProgram[i][j]));
                         unsigned int y;
                         y=j+1;
                         for(unsigned int x=i;x<stringProgram.size();x++){
@@ -99,9 +101,11 @@ void Programm::compileProgram(QString arg_program){
         ////------------------------------------Compiling------------------------------------////
         ////---------------------------------------------------------------------------------////
         print("\n-----------------------Start Compiling-----------------------\n");
+
         for(unsigned long i=0;i<stringProgram.size();i++){
             try{
-            unsigned int startPos=0;
+                comList.push_back(new Command(varSet,stringProgram[i]));
+            /*unsigned int startPos=0;
             if(stringProgram[i].size()>1){
                 //check for defines
                 if(Variable::checkIfIsVariableType(stringProgram[i][0])){
@@ -111,15 +115,15 @@ void Programm::compileProgram(QString arg_program){
                      }
                      operationArray.push_back(Operation(varSet,stringProgram[i][1],stringProgram[i][0]));
                 }
-                SubOperation::checkVarExist(varSet,stringProgram[i][startPos]);
+                Operation::checkVarExist(varSet,stringProgram[i][startPos]);
                 //check for Operations
                 if(stringProgram[i].size()>startPos+1){
                     if(stringProgram[i][startPos+1]==OperatorSyntaxEqual){
                         vector<QString> operatorVec(&stringProgram[i][startPos+2],&stringProgram[i][stringProgram[i].size()]);
-                        operationArray.push_back(Operation(varSet,operatorVec,SubOperation::getVariable(varSet,stringProgram[i][startPos])));
+                        operationArray.push_back(Operation(varSet,operatorVec,Operation::getVariable(varSet,stringProgram[i][startPos])));
                     }
                 }
-            }
+            }*/
             }
             catch(Error *er){
                 er->setLine(i);
@@ -135,8 +139,8 @@ void Programm::compileProgram(QString arg_program){
 
     if(errorList->size()==0){
         print("\n------------------------Start Program------------------------\n");
-        for(unsigned long i=0;i<operationArray.size();i++){
-            operationArray[i].exec();
+        for(unsigned long i=0;i<comList.size();i++){
+            comList[i]->exec();
             }
         print("\n-------------------------End Program-------------------------\n");
         print("\n-----------------------System Variable-----------------------\n");

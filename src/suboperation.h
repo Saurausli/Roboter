@@ -4,35 +4,16 @@
 #include <QObject>
 #include "variable.h"
 
-#define OperatorSyntaxPlus "+"
-#define OperatorSyntaxMinus "-"
-#define OperatorSyntaxMultiply  "*"
-#define OperatorSyntaxDivide "/"
 
-#define OperatorSyntaxAND "&&"
-#define OperatorSyntaxOR "||"
-
-#define OperatorSyntaxEqual "="
-
-#define subOperationBeginSyntax "("
-#define subOperationEndSyntax ")"
 
 using namespace std;
 
 
-enum Operator{
-    none,
-    plus,
-    minus,
-    multiply,
-    divide,
-    andBin,
-    orBin,
-};
+
 
 class SubOperation;
 
-typedef std::vector<SubOperation*> SubOperationList;
+
 
 class SubOperation
 {
@@ -44,16 +25,7 @@ public:
     void exec();
     Variable* getResult();
 
-    static vector<QString> getOperatorSyntax();
-    static Operator getOperator(QString arg_operatorName);
-    static int getVariableId(VariableSet *arg_varSet, QString arg_name);
-    static bool isOperator(QString &arg_name);
-    static bool isNumber(QString &arg_string);
-    static bool isVariable(VariableSet *arg_varSet,QString arg_name);
-    static Variable* getVariable(VariableSet *arg_varSet,QString arg_name);
-    static void checkVarExist(VariableSet *arg_varSet,QString arg_name);
-    static void checkVarExist(VariableSet *arg_varSet,QString arg_name,int &arg_pos);
-    static void checkVarTypFromOp(Variable *arg_var,Operator arg_op);
+
 
 private:
     void setupCalc(VariableSet *arg_varSet,vector<QString> arg_operation);

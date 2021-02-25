@@ -18,7 +18,6 @@ SOURCES += \
         $$srcPath/main.cpp \
         $$srcPath/operation.cpp \
         $$srcPath/programm.cpp \
-        $$srcPath/suboperation.cpp \
         $$srcPath/variable.cpp
 
 HEADERS += \
@@ -29,7 +28,6 @@ HEADERS += \
     $$srcPath/joint.h \
     $$srcPath/operation.h \
     $$srcPath/programm.h \
-    $$srcPath/suboperation.h \
     $$srcPath/variable.h
 
 

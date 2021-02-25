@@ -7,7 +7,7 @@
 #include <QTimer>
 #include "error.h"
 #include "joint.h"
-
+#include "operation.h"
 
 
 #define TURN_SYNTAX_NAME "turn"
@@ -31,7 +31,7 @@
 #define DEF_JOINT_SYNTAX "Joint"
 
 
-enum Function{
+enum BasicCommand{
     error,
     empty,
     turn,
@@ -71,14 +71,23 @@ struct GlobalVariables{
 using namespace std;
 
 
+class Command;
+
+typedef std::vector<Command*> CommandList;
 
 class Command:public QObject
 {
 
     Q_OBJECT
     public:
-        explicit Command(GlobalVariables& _globalVariables,int _programmLine, QString _command, QObject *parent= nullptr);
+        explicit Command(VariableSet *arg_varSet,vector<QString> arg_command, QObject *parent= nullptr);
         ~Command();
+        void exec();
+private:
+    VariableSet *varSet;
+    BasicCommand bcommand;
+    OperationList commandOperation;
+    Variable* defineVar;
    /*     void checkCommand();
         Function getFunction();
         unsigned int getLine();

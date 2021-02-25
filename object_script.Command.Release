@@ -6,7 +6,6 @@ release/joint.o
 release/main.o
 release/operation.o
 release/programm.o
-release/suboperation.o
 release/variable.o
 release/qml_Editor_qml.o
 release/qml_ErrorLine_qml.o

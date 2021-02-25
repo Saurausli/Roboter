@@ -33,10 +33,12 @@ public:
     void define();
     int getValuetoInt();
     bool getValuetoBool();
+    QString getValue();
     QString getName();
     VariableType getVariableType();
     static bool checkIfIsVariableType(QString arg_type);
     static void checkNumber(QString number);
+    static VariableType getVariableTypeFromString(QString arg_name);
     static void getVariableTypeFromString(QString arg_name, VariableType &var_Type,bool errorMessage=false);
     static vector<QString> getVariableTypeSyntax();
     static bool toBool(QString arg_value);

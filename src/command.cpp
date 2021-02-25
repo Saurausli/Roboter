@@ -1,10 +1,34 @@
 #include "command.h"
 
 
-Command::Command(GlobalVariables& _globalVariables,int _programmLine,
-                 QString _command,QObject *parent):
+Command::Command(VariableSet *arg_varSet,vector<QString> arg_command,QObject *parent):
     QObject(parent)
 {
+    bcommand=BasicCommand::error;
+    varSet=arg_varSet;
+    if(arg_command.size()>1){
+        if(Variable::checkIfIsVariableType(arg_command[0])){
+            Operation::checkIfVarNameFree(varSet,arg_command[1]);
+            defineVar=new Variable(Variable::getVariableTypeFromString(arg_command[0]),arg_command[1]);
+            arg_varSet->push_back(defineVar);
+            arg_command.erase(arg_command.begin());
+            arg_command.shrink_to_fit();
+            bcommand=BasicCommand::define;
+        }
+    }
+    if(arg_command.size()==1&&bcommand!=BasicCommand::define){
+        throw(new Error("expected expression"));
+    }
+    else if(arg_command.size()>1){
+        if(arg_command[1]==OperatorSyntaxEqual){
+            Operation::checkVarExist(varSet,arg_command[0]);
+            defineVar=Operation::getVariable(varSet,arg_command[0]);
+            vector<QString> tempVec(&arg_command[2],&arg_command[arg_command.size()]);
+            commandOperation.push_back(new Operation(varSet,tempVec));
+            bcommand=BasicCommand::set;
+        }
+    }
+
     /*programmLine=_programmLine;
     command=_command;
     globalVariables=&_globalVariables;
@@ -13,6 +37,17 @@ Command::Command(GlobalVariables& _globalVariables,int _programmLine,
 }
 Command::~Command(){
 
+}
+
+void Command::exec(){
+    for(unsigned int i=0;i<commandOperation.size();i++){
+        commandOperation[i]->exec();
+    }
+    switch(bcommand){
+        case BasicCommand::set:{
+            Operation::copyVariable(commandOperation[0]->getResult(),defineVar);
+        }
+    }
 }
 /*
 void Command::checkCommand(){
@@ -275,13 +310,13 @@ void Command::exec(){
         emit executeError((*er));
     }
 }
-/*else{
+else{
     if(loop){
         runningCommand=0;
         emit ProgrammFinished();
         return;
     }
-}*//*
+}
 
 
 Function Command::getFunction(){
@@ -340,83 +375,5 @@ bool Command::checkWordBeginnig(QString word,QString beginning){
             return true;
         }
         return false;
-}
-
-void Command::checkLength(vector<QString> &com,unsigned long len){
-    checkMinLength(com,len);
-    checkMaxLength(com,len);
-}
-
-void Command::checkMinLength(vector<QString> &com,unsigned long len){
-    if(com.size()<len){
-        throw(new Error(programmLine,"to few arguments: found: "+QString::number(com.size())+" minimum: "+QString::number(len),command));
-    }
-}
-void Command::checkMaxLength(vector<QString> &com,unsigned long len){
-    if(com.size()>len){
-        throw(new Error(programmLine,"to many arguments: found: "+QString::number(com.size())+" maximum: "+QString::number(len),command));
-    }
-}
-void Command::checkMinMaxLength(vector<QString> &com,unsigned long min,unsigned long max){
-    checkMinLength(com,min);
-    checkMaxLength(com,max);
-}
-void Command::checkValueMin(int value, int min){
-    if(value<min){
-        throw(new Error(programmLine,"value to low : found:"+QString::number(value)+" minimum: "+QString::number(min),command));
-    }
-}
-
-void Command::checkValueMax(int value, int max){
-    if(value>max){
-        throw(new Error(programmLine,"value to high : found:"+QString::number(value)+" maximum: "+QString::number(max),command));
-    }
-}
-void Command::checkValueMinMax(int value, int min, int max){
-    checkValueMin(value,min);
-    checkValueMax(value,max);
-}
-void Command::checkDefineName(QString name){
-    if(findDoubleMotor(name)>-1||findJoint(name)>-1){
-        throw(new Error(programmLine,"redefinition of \'"+name+"\' ",command));
-    }
-}
-
-int Command::findDoubleMotor(QString name){
-    for(unsigned long i=0;i<globalVariables->doubleJointMotor.size();i++){
-        if(name==globalVariables->doubleJointMotor[i]->getName()){
-            return i;
-        }
-    }
-    return -1;
-}
-int Command::findJoint(QString name){
-    for(unsigned long i=0;i<globalVariables->joints.size();i++){
-        if(name==globalVariables->joints[i]->getName()){
-            return i;
-        }
-    }
-    return -1;
-}
-void Command::checkMotor(QString name, bool &doubleMotor){
-    doubleMotor=false;
-    for(unsigned long i=0;i<globalVariables->doubleJointMotor.size();i++){
-        if(name==globalVariables->doubleJointMotor[i]->getName()){
-            doubleMotor=true;
-            return;
-        }
-    }
-    throw(new Error(programmLine,name+" Motor not defined",command));
-}
-
-void Command::commandFinishedSlot(){
-    switch (function) {
-            case turn:
-                disconnect(joint,SIGNAL(commandFinished()),this,SLOT(commandFinishedSlot()));
-                break;
-    }
-    //qDebug()<<programmLine<<" Finished";
-
-    emit commandFinished();
 }
 */

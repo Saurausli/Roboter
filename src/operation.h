@@ -5,7 +5,19 @@
 
 #include <vector>
 #include <iostream>
-#include "suboperation.h"
+#include "variable.h"
+#define OperatorSyntaxPlus "+"
+#define OperatorSyntaxMinus "-"
+#define OperatorSyntaxMultiply  "*"
+#define OperatorSyntaxDivide "/"
+
+#define OperatorSyntaxAND "&&"
+#define OperatorSyntaxOR "||"
+
+#define OperatorSyntaxEqual "="
+
+#define OperationBeginSyntax "("
+#define OperationEndSyntax ")"
 
 #define DEF_COMMENT_SYNTAX "//"
 
@@ -15,10 +27,24 @@ struct subOperationStruct{
     vector<QString> op;
 };
 
+enum Operator{
+    none,
+    plus,
+    minus,
+    multiply,
+    divide,
+    andBin,
+    orBin,
+};
+
 enum Task{
     defineVariable,
     calculet
 };
+
+class Operation;
+
+typedef std::vector<Operation*> OperationList;
 
 class Operation
 {
@@ -33,30 +59,42 @@ public:
     Variable* getResult();
     void setResultVariable(Variable *arg_var);
 
+    static vector<QString> getOperatorSyntax();
+    static Operator getOperator(QString arg_operatorName);
+    static int getVariableId(VariableSet *arg_varSet, QString arg_name);
+    static bool isOperator(QString &arg_name);
+    static bool isNumber(QString &arg_string);
+
+    static bool isVariable(VariableSet *arg_varSet,QString arg_name);
+    static Variable* getVariable(VariableSet *arg_varSet,QString arg_name);
+    static void checkVarExist(VariableSet *arg_varSet,QString arg_name);
+    static void checkVarExist(VariableSet *arg_varSet,QString arg_name,int &arg_pos);
+    static void checkIfVarNameFree(VariableSet *arg_varSet,QString arg_name);
+
+    static void checkarg_length(vector<QString> &arg_com,unsigned long arg_len);
+    static void checkMinarg_length(vector<QString> &arg_com,unsigned long arg_len);
+    static void checkMaxarg_length(vector<QString> &arg_com,unsigned long arg_len);
+    static void checkMinMaxarg_length(vector<QString> &arg_com,unsigned long arg_min,unsigned long arg_max);
+
+    static void checkAllVarType(VariableSet *arg_varSet, VariableType arg_typ);
+    static void checkVarType(Variable* arg_var, VariableType arg_typ);
+    static void checkVarTypFromOp(Variable *arg_var,Operator arg_op);
+    static void calc(Variable &arg_var1,Variable &arg_var2,Operator arg_op,Variable &arg_result);
+    static void copyVariable(Variable* arg_source, Variable* arg_destination);
+
 private:
     //void arithmicSetup(vector<Variable*> arg_VarVec,Variable* arg_result ,Operator arg_Op);
     void setupDefine(VariableSet *arg_varSet,QString arg_name, VariableType arg_type,QString arg_startValue);
     void setupCalc(VariableSet *arg_varSet,vector<QString> arg_operation);
 
-    void checkLength(vector<QString> &com,unsigned long len);
-    void checkMinLength(vector<QString> &com,unsigned long len);
-    void checkMaxLength(vector<QString> &com,unsigned long len);
-    void checkMinMaxLength(vector<QString> &com,unsigned long min,unsigned long max);
 
-    void checkAllVarType(vector<QString> &arg_vec, VariableType arg_typ);
-    void checkVarType(Variable* arg_var, VariableType arg_typ);
-    void checkIfVarNameFree(QString arg_name);
 
     vector<Variable*> usedVariable;
-    vector<Operation*> subOp;
+    OperationList subOp;
     vector<Operator> usedOperator;
     VariableSet *varSet;
-    Task task;
 
-    Variable *defineVar;
-    vector<QString> operation;
     Variable *result;
-    SubOperationList subOpList;
 };
 
 #endif // OPERATION_H

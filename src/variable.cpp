@@ -56,6 +56,10 @@ bool Variable::getValuetoBool(){
     return toBool(value);
 }
 
+QString Variable::getValue(){
+    return value;
+}
+
 QString Variable::getName(){
     return name;
 }
@@ -78,17 +82,19 @@ void Variable::checkNumber(QString number){
     }
 }
 
-void Variable::getVariableTypeFromString(QString arg_name, VariableType &var_Type,bool errorMessage){
+VariableType Variable::getVariableTypeFromString(QString arg_name){
     if(arg_name==VariableSyntaxInteger){
-        var_Type =VariableType::Integer;
-        return;
+        return VariableType::Integer;
     }
     if(arg_name==VariableSyntaxBool){
-        var_Type =VariableType::Boolean;
-        return;
+        return VariableType::Boolean;
     }
-    var_Type =VariableType::unknown;
-    if(errorMessage){
+    return VariableType::unknown;
+}
+
+void Variable::getVariableTypeFromString(QString arg_name, VariableType &var_Type,bool errorMessage){
+    var_Type=getVariableTypeFromString(arg_name);
+    if(errorMessage&&var_Type==VariableType::unknown){
         throw(new Error(arg_name +" is no varible type"));
     }
 }

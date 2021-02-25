@@ -6,7 +6,6 @@ debug/joint.o
 debug/main.o
 debug/operation.o
 debug/programm.o
-debug/suboperation.o
 debug/variable.o
 debug/qml_Editor_qml.o
 debug/qml_ErrorLine_qml.o

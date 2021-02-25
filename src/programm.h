@@ -43,8 +43,7 @@ protected:
 private:
     void print(QString arg_print);
     VariableSet *varSet;
-    vector<Operation> operationArray;
-
+    CommandList comList;
     /*
 x = 1
 
