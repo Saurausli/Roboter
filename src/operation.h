@@ -7,7 +7,7 @@
 #include <iostream>
 #include "suboperation.h"
 
-
+#define DEF_COMMENT_SYNTAX "//"
 
 struct subOperationStruct{
     int start=-1;
@@ -47,7 +47,9 @@ private:
     void checkVarType(Variable* arg_var, VariableType arg_typ);
     void checkIfVarNameFree(QString arg_name);
 
-
+    vector<Variable*> usedVariable;
+    vector<Operation*> subOp;
+    vector<Operator> usedOperator;
     VariableSet *varSet;
     Task task;
 

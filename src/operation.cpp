@@ -2,7 +2,9 @@
 
 Operation::Operation(VariableSet *arg_varSet,vector<QString> arg_operation)//for Arithmetic
 {
+    qDebug()<<"constructor";
     result=new Variable(subOpList[subOpList.size()-1]->getResult()->getVariableType(),"res");
+
     setupCalc(arg_varSet,arg_operation);
 }
 Operation::Operation(VariableSet *arg_varSet,vector<QString> arg_operation, Variable *res){
@@ -59,7 +61,48 @@ void Operation::setupDefine(VariableSet *arg_varSet,QString arg_name, VariableTy
 void Operation::setupCalc(VariableSet *arg_varSet,vector<QString> arg_operation){
     varSet=arg_varSet;
     operation=arg_operation;
-    vector<QString> provVariable;
+    bool operatorPossible=false;
+    bool varExpected=true;
+    qDebug()<<arg_operation;
+    for(unsigned int i=0;i<arg_operation.size();i++){
+        if(arg_operation[i]==subOperationBeginSyntax){
+            bool found=false;
+            unsigned int foundIndex=i+1;
+            int openBrackets=1;
+            qDebug()<<"search ')'";
+            while(!found){
+                qDebug()<<foundIndex<<" "<<arg_operation[foundIndex]<<" "<<openBrackets;
+                if(foundIndex>=arg_operation.size()){
+                    throw(new Error("expected ')'"));
+                }
+                else if(arg_operation[foundIndex]==subOperationBeginSyntax){
+                    openBrackets++;
+                }
+                else if(arg_operation[foundIndex]==subOperationEndSyntax){
+                    openBrackets--;
+                }
+                if(openBrackets==0){
+                    if(i+1==foundIndex){
+                        throw(new Error("expected expression"));
+                    }
+                    qDebug()<<"found ) "<<i<<" "<<foundIndex<<" "<<arg_operation[i]<< " "<<arg_operation[foundIndex];
+                    found=true;
+                    subOp.push_back(new Operation(varSet,vector<QString>(&arg_operation[i],&arg_operation[foundIndex])));
+                    i=foundIndex+1;
+                }
+                else{
+                    foundIndex++;
+                }
+            }
+        }
+        /*else if(varExpected){
+            SubOperation::checkVarExist(varSet,arg_operation[i]);
+        }
+        else if(arg_operation[i]==DEF_COMMENT_SYNTAX){
+            break;
+        }*/
+    }
+    /*vector<QString> provVariable;
     arg_operation.insert(arg_operation.begin(),subOperationBeginSyntax);
     arg_operation.push_back(subOperationEndSyntax);
     do{
@@ -94,7 +137,7 @@ void Operation::setupCalc(VariableSet *arg_varSet,vector<QString> arg_operation)
         arg_operation.insert(arg_operation.begin()+int(lastOpenBracket),subOpList[subOpList.size()-1]->getResult()->getName());
         }while(arg_operation.size()>1);
 
-    task=Task::calculet;
+    task=Task::calculet;*/
 }
 
 void Operation::checkLength(vector<QString> &com,unsigned long len){

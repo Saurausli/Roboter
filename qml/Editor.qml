@@ -147,6 +147,7 @@ Rectangle{
             readOnly: programmRunning
             property int lengthPrevious: 0
             property int cursorLine: (cursorRectangle.y+fontMetrics.height)/fontMetrics.height
+            property int prevLineCount: 0
             onCursorLineChanged: {
                 ensureVisible(cursorRectangle)
             }
@@ -164,6 +165,7 @@ Rectangle{
             textFormat:Text.RichText
             wrapMode: TextEdit.NoWrap
             text: " "
+
             Component.onCompleted: {
                 textProv=textEditInput.text
                 textProv=textEditInput.getFormattedText(0,textEditInput.length)
@@ -303,16 +305,14 @@ Rectangle{
         string=toRichText(string)
         textEditInput.remove(0,textEditInput.length)
         textEditInput.insert(0,"<pre>"+string+"</pre>")
-        textProv=textEditInput.getFormattedText(0,textEditInput.length)
-        textProv=textProv.replace("white-space: pre-wrap","white-space: pre")
-        textEditInput.text=textProv
+
 
         lockBar=false
         displayColorTextAll()
 
         textEditInput.cursorPosition=cursorPos
         ensureVisible(textEditInput.cursorRectangle)
-        console.debug(textEditInput.text)
+        //console.debug(textEditInput.text)
     }
 
     function toRichText(string){
@@ -348,7 +348,9 @@ Rectangle{
 
         textProv=textEditInput.getText(start,end)
 
-        displayColorText()/*
+        displayColorText()
+        //console.debug(textProv)
+        /*
         if(line==1){
             textProv="<pre>"+textProv
         }*/
@@ -367,16 +369,27 @@ Rectangle{
         textEditInput.remove(start,end)
         textEditInput.insert(start,"<pre>"+textProv+"</pre>")
 
-    /*    textProv=textEditInput.getFormattedText(0,textEditInput.length)
+        textProv=textEditInput.getFormattedText(0,textEditInput.length)
 
         textProv=textProv.replace("white-space: pre-wrap","white-space: pre")
-
+        var t0= new Date().getTime();
         //console.debug(textProv)
         textEditInput.text=textProv
-        var t0= new Date().getTime();
+
         textEditInput.cursorPosition=cursorPos
-        console.debug(new Date().getTime()-t0)
-        console.debug(textEditInput.text)*/
+        //console.debug(new Date().getTime()-t0)
+        //console.debug(textEditInput.text)
+       /*if(textEditInput.prevLineCount<textEditInput.lineCount){
+            textProv=textEditInput.getFormattedText(0,textEditInput.length)
+
+            textProv=textProv.replace("white-space: pre-wrap","white-space: pre")
+            console.debug(textProv)
+            textEditInput.text=textProv
+            console.debug("set text edit")
+            console.debug(textEditInput.text)
+        }*/
+        //textEditInput.prevLineCount=textEditInput.lineCount
+        //textEditInput.cursorPosition=cursorPos
         lockBar=false
 
     }
@@ -468,7 +481,7 @@ Rectangle{
         else if(provContent>textEditInput.height-textflick.height){
             provContent=textEditInput.height-textflick.height
         }
-        console.debug(provContent)
+        //console.debug(provContent)
         textflick.contentY=provContent;
     }
 }

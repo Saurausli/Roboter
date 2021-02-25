@@ -30,7 +30,7 @@
 
 #define DEF_JOINT_SYNTAX "Joint"
 
-#define DEF_COMMENT_SYNTAX "//"
+
 enum Function{
     error,
     empty,
