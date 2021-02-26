@@ -64,6 +64,7 @@ public:
     static int getVariableId(VariableSet *arg_varSet, QString arg_name);
     static bool isOperator(QString &arg_name);
     static bool isNumber(QString &arg_string);
+    static bool isBool(QString &arg_string);
 
     static bool isVariable(VariableSet *arg_varSet,QString arg_name);
     static Variable* getVariable(VariableSet *arg_varSet,QString arg_name);

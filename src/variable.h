@@ -29,6 +29,7 @@ public:
     Variable(VariableType arg_type,QString arg_name);
     void setValue(QString arg_value);
     void setValue(int arg_value);
+    void setValue(bool arg_value);
     void setType(VariableType arg_type);
     void define();
     int getValuetoInt();

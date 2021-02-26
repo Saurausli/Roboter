@@ -8,10 +8,20 @@ Variable::Variable(VariableType arg_type,QString arg_name,QString arg_value){
 Variable::Variable(VariableType arg_type,QString arg_name)
 {
     varSetup(arg_type,arg_name);
-    setValue(0);
+    switch (type) {
+        case Integer:
+            setValue(0);
+            break;
+        case Boolean:
+            setValue(false);
+            break;
+
+    }
+    ;
 }
 
 void Variable::setValue(QString arg_value){
+    qDebug()<<"string "<<name<<" "<<arg_value;
     try {
         value=arg_value;
         switch (type) {
@@ -21,16 +31,28 @@ void Variable::setValue(QString arg_value){
             case Boolean:
                 checkBool(value);
                 break;
-
         }
     }
     catch(Error *er){
         qDebug()<<er->getMessage();
     }
+    qDebug()<<value;
 }
 
 void Variable::setValue(int arg_value){
+    qDebug()<<"int";
     value=QString::number(arg_value);
+}
+
+void Variable::setValue(bool arg_value){
+    qDebug()<<"bool "<<name;
+    if(arg_value){
+        value=BoolValueTrue;
+    }
+    else{
+        value=BoolValueFalse;
+    }
+    qDebug()<<arg_value;
 }
 
 void Variable::setType(VariableType arg_type){
@@ -116,7 +138,7 @@ bool Variable::toBool(QString arg_value){
 }
 void Variable::checkBool(QString arg_value){
     if(!(arg_value==BoolValueTrue||arg_value==BoolValueFalse)){
-        throw(new Error("bool value wrong"));
+        throw(new Error("bool value wrong "+arg_value));
     }
 }
 

@@ -70,21 +70,12 @@ void Programm::compileProgram(QString arg_program){
                 for(unsigned int j=0;j<stringProgram[i].size();j++){
                     if(Operation::isNumber(stringProgram[i][j])){
                         varSet->push_back(new Variable(VariableType::Integer,"#int_"+stringProgram[i][j],stringProgram[i][j]));
-                        unsigned int y;
-                        y=j+1;
-                        for(unsigned int x=i;x<stringProgram.size();x++){
-                            while(y<stringProgram[x].size()){
-                                if(stringProgram[i][j]==stringProgram[x][y]){
-                                    stringProgram[x][y]="#int_"+stringProgram[i][j];
-                                }
-                                y++;
-
-                            }
-                            y=0;
+                        replaceString(&stringProgram,stringProgram[i][j],"#int_"+stringProgram[i][j],i);
                         }
-                        stringProgram[i][j]="#int_"+stringProgram[i][j];
-
-                    }
+                    else if(Operation::isBool(stringProgram[i][j])){
+                        varSet->push_back(new Variable(VariableType::Boolean,"#boolean_"+stringProgram[i][j],stringProgram[i][j]));
+                        replaceString(&stringProgram,stringProgram[i][j],"#boolean_"+stringProgram[i][j],i);
+                        }
                     }
 
 
@@ -178,6 +169,16 @@ vector<QString> Programm::split(QString _str, char delimiter) {
 void Programm::print(QString arg_print){
     emit newOutput(arg_print);
     //qDebug()<<arg_print;
+}
+
+void Programm::replaceString(vector<vector<QString>> *arg_vec,QString arg_currentString,QString arg_newString,  unsigned int startX){
+    for(unsigned int x=startX;x<arg_vec->size();x++){
+        for(unsigned int y=0;y<(*arg_vec)[x].size();y++){
+            if((*arg_vec)[x][y]==arg_currentString){
+                (*arg_vec)[x][y]=arg_newString;
+            }
+        }
+    }
 }
 
 /*

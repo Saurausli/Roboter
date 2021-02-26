@@ -26,8 +26,10 @@ void Operation::exec(){
     for(unsigned int i=0;i<subOp.size();i++){
         subOp[i]->exec();
     }
-    qDebug()<<usedVariable[0]->getValue();
-    result = new Variable(usedVariable[0]->getVariableType(),"res",usedVariable[0]->getValue());
+    result->setType(usedVariable[0]->getVariableType());
+    result->setValue(usedVariable[0]->getValue());
+
+
     for(unsigned int i=1;i<usedVariable.size();i++){
         calc(*result,*usedVariable[i],usedOperator[i-1],*result);
     }
@@ -128,6 +130,10 @@ bool Operation::isNumber(QString &arg_string){
     return ok;
 }
 
+bool Operation::isBool(QString &arg_string){
+    return (arg_string==BoolValueTrue||arg_string==BoolValueFalse);
+}
+
 bool Operation::isVariable(VariableSet *arg_varSet,QString arg_name){
     for(unsigned long i=0;i<arg_varSet->size();i++){
         if((*arg_varSet)[i]->getName()==arg_name){
@@ -170,6 +176,7 @@ void Operation::setupCalc(VariableSet *arg_varSet,vector<QString> arg_operation)
     varSet=arg_varSet;
     bool operatorPossible=false;
     bool varExpected=true;
+    result = new Variable(VariableType::unknown,"res");
     for(unsigned int i=0;i<arg_operation.size();i++){
         if(varExpected){
             if(arg_operation[i]==OperationBeginSyntax){
@@ -192,6 +199,7 @@ void Operation::setupCalc(VariableSet *arg_varSet,vector<QString> arg_operation)
                         }
                         found=true;
                         subOp.push_back(new Operation(varSet,vector<QString>(&arg_operation[i+1],&arg_operation[foundIndex])));
+                        usedVariable.push_back(subOp[subOp.size()-1]->getResult());
                         i=foundIndex;
                     }
                     else{
@@ -279,32 +287,32 @@ void Operation::calc(Variable &arg_var1,Variable &arg_var2,Operator arg_op,Varia
         case Operator::plus:
             checkAllVarType(&varTempSet,VariableType::Integer);
             arg_result.setType(VariableType::Integer);
-            arg_result.setValue(arg_var1.getValuetoInt()+arg_var1.getValuetoInt());
+            arg_result.setValue(arg_var1.getValuetoInt()+arg_var2.getValuetoInt());
             break;
         case Operator::minus:
             checkAllVarType(&varTempSet,VariableType::Integer);
             arg_result.setType(VariableType::Integer);
-            arg_result.setValue(arg_var1.getValuetoInt()-arg_var1.getValuetoInt());
+            arg_result.setValue(arg_var1.getValuetoInt()-arg_var2.getValuetoInt());
             break;
         case Operator::multiply:
             checkAllVarType(&varTempSet,VariableType::Integer);
             arg_result.setType(VariableType::Integer);
-            arg_result.setValue(arg_var1.getValuetoInt()*arg_var1.getValuetoInt());
+            arg_result.setValue(arg_var1.getValuetoInt()*arg_var2.getValuetoInt());
             break;
         case Operator::divide:
             checkAllVarType(&varTempSet,VariableType::Integer);
             arg_result.setType(VariableType::Integer);
-            arg_result.setValue(arg_var1.getValuetoInt()/arg_var1.getValuetoInt());
+            arg_result.setValue(arg_var1.getValuetoInt()/arg_var2.getValuetoInt());
             break;
         case Operator::andBin:
             checkAllVarType(&varTempSet,VariableType::Boolean);
             arg_result.setType(VariableType::Boolean);
-            arg_result.setValue(arg_var1.getValuetoInt()&&arg_var1.getValuetoInt());
+            arg_result.setValue(arg_var1.getValuetoBool()&&arg_var2.getValuetoBool());
             break;
         case Operator::orBin:
             checkAllVarType(&varTempSet,VariableType::Boolean);
             arg_result.setType(VariableType::Boolean);
-            arg_result.setValue(arg_var1.getValuetoInt()||arg_var1.getValuetoInt());
+            arg_result.setValue(arg_var1.getValuetoBool()||arg_var2.getValuetoBool());
             break;
         default:
             break;

@@ -156,9 +156,10 @@ Window {
                         target: Backend
                         onNewOutput:{
                             textOutput.text+="\n"+output
-                            if(textOutput.height>bottomBar.height){
-                                generalFlick.contentY=generalFlick.height-bottomBar.height;
+                            if(textOutput.height>generalFlick.height){
+                                generalFlick.contentY=textOutput.height-generalFlick.height;
                             }
+
                         }
                     }
                 }
