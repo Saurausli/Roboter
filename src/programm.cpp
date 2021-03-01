@@ -14,12 +14,12 @@ Programm::~Programm(){
 }
 void Programm::compileProgram(QString arg_program){
     try {
-
         print("\n----------------------Start Preparation----------------------\n");
         comList.clear();
         comList.shrink_to_fit();
         varSet = new VariableSet;
         errorList = new ErrorList;
+        brackets = new BracketList;
         ////---------------------------------------------------------------------------------////
         ////-----------------------------------PREPARATION-----------------------------------////
         ////---------------------------------------------------------------------------------////
@@ -30,25 +30,22 @@ void Programm::compileProgram(QString arg_program){
         file<< arg_program.toStdString();
         file.close();
 
-        //make sure Operatorchar are clearly seperated
+        //make sure Operatorchar are clearly seperated and dont seperat between some char. For Exampel "=" and "==" and no "=" and " =  = "
+        arg_program.replace("\t","");
         vector<QString> findStr;
         findStr=Operation::getOperatorSyntax();
-        for(unsigned int i=0;i<findStr.size();i++){
-            arg_program.replace(findStr[i]," "+findStr[i]+" ");
-        }
-        QString prov;
-        prov=OperatorSyntaxEqual;
-        prov+="  ";
-        prov+=OperatorSyntaxMinus;
-        QString prov1;
-        prov1=prov+" ";
-        arg_program.replace(prov1,prov);
+        vector<QString> actualStr;
+        actualStr=Operation::getOperatorSyntax();
 
-        prov=OperationBeginSyntax;
-        prov+="  ";
-        prov+=OperatorSyntaxMinus;
-        prov1=prov+" ";
-        arg_program.replace(prov1,prov);
+        for(unsigned int i=0;i<findStr.size();i++){
+            for(unsigned int j=i+1;j<actualStr.size();j++){
+                actualStr[j].replace(findStr[i]," "+findStr[i]+" ");
+            }
+        }
+        for(unsigned int i=0;i<actualStr.size();i++){
+            arg_program.replace(actualStr[i]," "+findStr[i]+" ");
+        }
+
         // stringProgram[line][word]
 
         vector<vector<QString>> stringProgram;
@@ -57,14 +54,14 @@ void Programm::compileProgram(QString arg_program){
         // Split Programm into lines
 
         lineVec=split(arg_program,'\n');
-        for(unsigned long i=0; i<lineVec.size();i++){ // Split Programm into words
+
+        // Split Programm into words
+        for(unsigned long i=0; i<lineVec.size();i++){
             stringProgram.push_back(split(lineVec[i],' '));
             stringProgram[i].erase(remove(stringProgram[i].begin(),stringProgram[i].end(),""),stringProgram[i].end());
             stringProgram[i].shrink_to_fit();
         }
-
         // replace numbers with Variables
-
         for(unsigned int i=0;i<stringProgram.size();i++){
             try{
                 for(unsigned int j=0;j<stringProgram[i].size();j++){
@@ -95,26 +92,14 @@ void Programm::compileProgram(QString arg_program){
 
         for(unsigned long i=0;i<stringProgram.size();i++){
             try{
-                comList.push_back(new Command(varSet,stringProgram[i]));
-            /*unsigned int startPos=0;
-            if(stringProgram[i].size()>1){
-                //check for defines
-                if(Variable::checkIfIsVariableType(stringProgram[i][0])){
-                     startPos=1;
-                     if(stringProgram[i][1].left(1)=="#"){
-                         throw(new Error("# is reserved for program variables"));
-                     }
-                     operationArray.push_back(Operation(varSet,stringProgram[i][1],stringProgram[i][0]));
+                comList.push_back(new Command(varSet,brackets,stringProgram[i]));
+                if(comList.size()>1&&errorList->size()==0){
+                    connect(comList[i-1],SIGNAL(nextLine()),comList[i],SLOT(exec()));
                 }
-                Operation::checkVarExist(varSet,stringProgram[i][startPos]);
-                //check for Operations
-                if(stringProgram[i].size()>startPos+1){
-                    if(stringProgram[i][startPos+1]==OperatorSyntaxEqual){
-                        vector<QString> operatorVec(&stringProgram[i][startPos+2],&stringProgram[i][stringProgram[i].size()]);
-                        operationArray.push_back(Operation(varSet,operatorVec,Operation::getVariable(varSet,stringProgram[i][startPos])));
-                    }
+                if(i==stringProgram.size()-1&&errorList->size()==0){
+                    comList[i]->checkIfAllBracketsClosed();
+                    connect(comList[i],SIGNAL(nextLine()),this,SLOT(programFinished()));
                 }
-            }*/
             }
             catch(Error *er){
                 er->setLine(i);
@@ -130,27 +115,20 @@ void Programm::compileProgram(QString arg_program){
 
     if(errorList->size()==0){
         print("\n------------------------Start Program------------------------\n");
-        for(unsigned long i=0;i<comList.size();i++){
-            comList[i]->exec();
-            }
-        print("\n-------------------------End Program-------------------------\n");
-        print("\n-----------------------System Variable-----------------------\n");
-        for(unsigned i=0;i<varSet->size();i++){
-            if((*varSet)[i]->getName().left(1)=="#")
-                print((*varSet)[i]->getName()+" = "+QString::number((*varSet)[i]->getValuetoInt()));
+        //for(unsigned long i=0;i<comList.size();i++){
+        if(comList.size()>0){
+            comList[0]->exec();
         }
-        print("\n------------------------User Variable------------------------\n");
-        for(unsigned i=0;i<varSet->size();i++){
-            if((*varSet)[i]->getName().left(1)!="#")
-                print((*varSet)[i]->getName()+" = "+QString::number((*varSet)[i]->getValuetoInt()));
+        else{
+            programFinished();
         }
     }
     else{
         print("\n------------------------Error Occured------------------------\n");
         emit errorOccured();
     }
-    print("\n-------------------------End Program-------------------------\n");
-    emit programmFinished();
+
+
 }
 
 vector<QString> Programm::split(QString _str, char delimiter) {
@@ -166,9 +144,24 @@ vector<QString> Programm::split(QString _str, char delimiter) {
   return internal;
 }
 
+void Programm::programFinished(){
+    print("\n-------------------------End Program-------------------------\n");
+    print("\n-----------------------System Variable-----------------------\n");
+    for(unsigned i=0;i<varSet->size();i++){
+        if((*varSet)[i]->getName().left(1)=="#")
+            print(Variable::getVariableTypeName((*varSet)[i]->getVariableType())+" "+(*varSet)[i]->getName()+" = "+(*varSet)[i]->getValue());
+    }
+    print("\n------------------------User Variable------------------------\n");
+    for(unsigned i=0;i<varSet->size();i++){
+        if((*varSet)[i]->getName().left(1)!="#")
+            print(Variable::getVariableTypeName((*varSet)[i]->getVariableType())+" "+(*varSet)[i]->getName()+" = "+(*varSet)[i]->getValue());
+    }
+    emit programmFinished();
+}
+
 void Programm::print(QString arg_print){
     emit newOutput(arg_print);
-    //qDebug()<<arg_print;
+    qDebug()<<arg_print;
 }
 
 void Programm::replaceString(vector<vector<QString>> *arg_vec,QString arg_currentString,QString arg_newString,  unsigned int startX){

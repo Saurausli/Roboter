@@ -44,6 +44,7 @@ public:
     static vector<QString> getVariableTypeSyntax();
     static bool toBool(QString arg_value);
     static void checkBool(QString arg_value);
+    static QString getVariableTypeName(VariableType arg_type);
 private:
     QString value;
     VariableType type;

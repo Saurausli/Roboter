@@ -79,6 +79,12 @@ vector<QString> Operation::getOperatorSyntax(){
     opVec.push_back(OperationBeginSyntax);
     opVec.push_back(OperatorSyntaxAND);
     opVec.push_back(OperatorSyntaxOR);
+    opVec.push_back(OperatorSyntaxGreater);
+    opVec.push_back(OperatorSyntaxLess);
+    opVec.push_back(OperatorSyntaxGreaterOrEqual);
+    opVec.push_back(OperatorSyntaxGreaterOrLess);
+    opVec.push_back(OperatorSyntaxNotEqual);
+    opVec.push_back(OperatorSyntaxDoubleEqual);
     return opVec;
 }
 
@@ -118,8 +124,23 @@ Operator Operation::getOperator(QString arg_operatorName){
     if(arg_operatorName==OperatorSyntaxAND){
         return Operator::andBin;
     }
-    if(arg_operatorName==OperatorSyntaxOR){
-        return Operator::orBin;
+    if(arg_operatorName==OperatorSyntaxGreater){
+        return Operator::greater;
+    }
+    if(arg_operatorName==OperatorSyntaxLess){
+        return Operator::less;
+    }
+    if(arg_operatorName==OperatorSyntaxGreaterOrEqual){
+        return Operator::greaterOrEqual;
+    }
+    if(arg_operatorName==OperatorSyntaxGreaterOrLess){
+        return Operator::greaterOrLess;
+    }
+    if(arg_operatorName==OperatorSyntaxNotEqual){
+        return Operator::notEqual;
+    }
+    if(arg_operatorName==OperatorSyntaxDoubleEqual){
+        return Operator::doubleEqual;
     }
     return Operator::none;
 }
@@ -313,6 +334,36 @@ void Operation::calc(Variable &arg_var1,Variable &arg_var2,Operator arg_op,Varia
             checkAllVarType(&varTempSet,VariableType::Boolean);
             arg_result.setType(VariableType::Boolean);
             arg_result.setValue(arg_var1.getValuetoBool()||arg_var2.getValuetoBool());
+            break;
+        case Operator::greater:
+            checkAllVarType(&varTempSet,VariableType::Integer);
+            arg_result.setType(VariableType::Boolean);
+            arg_result.setValue(arg_var1.getValuetoInt()>arg_var2.getValuetoInt());
+            break;
+        case Operator::less:
+            checkAllVarType(&varTempSet,VariableType::Integer);
+            arg_result.setType(VariableType::Boolean);
+            arg_result.setValue(arg_var1.getValuetoInt()<arg_var2.getValuetoInt());
+            break;
+        case Operator::greaterOrEqual:
+            checkAllVarType(&varTempSet,VariableType::Integer);
+            arg_result.setType(VariableType::Boolean);
+            arg_result.setValue(arg_var1.getValuetoInt()>=arg_var2.getValuetoInt());
+            break;
+        case Operator::greaterOrLess:
+            checkAllVarType(&varTempSet,VariableType::Integer);
+            arg_result.setType(VariableType::Boolean);
+            arg_result.setValue(arg_var1.getValuetoInt()<=arg_var2.getValuetoInt());
+            break;
+        case Operator::notEqual:
+            checkAllVarType(&varTempSet,arg_var1.getVariableType());
+            arg_result.setType(VariableType::Boolean);
+            arg_result.setValue(arg_var1.getValue()!=arg_var2.getValue());
+            break;
+        case Operator::doubleEqual:
+            checkAllVarType(&varTempSet,arg_var1.getVariableType());
+            arg_result.setType(VariableType::Boolean);
+            arg_result.setValue(arg_var1.getValue()==arg_var2.getValue());
             break;
         default:
             break;

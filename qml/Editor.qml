@@ -161,11 +161,13 @@ Rectangle{
             color:"#d6cf9a"
             selectedTextColor: "#bec0c2"
             selectionColor: "#1d545c"
+            tabStopDistance:40
             onCursorRectangleChanged: ensureVisible(cursorRectangle)
-            textFormat:Text.RichText
+            //textFormat:Text.RichText
+            textFormat: Text.PlainText
             wrapMode: TextEdit.NoWrap
             text: " "
-
+/*
             Component.onCompleted: {
                 textProv=textEditInput.text
                 textProv=textEditInput.getFormattedText(0,textEditInput.length)
@@ -173,10 +175,10 @@ Rectangle{
                 //console.debug(textProv)
                 textEditInput.text=textProv
             }
-
+*/
             property int prevLinCount: 0
             onLengthChanged: {
-
+/*
                 if(!lockBar&&length!=lengthPrevious){
                     lengthPrevious=length;
                     if(lineCount-prevLinCount>1){
@@ -187,7 +189,7 @@ Rectangle{
                     prevLinCount=lineCount
                     displayColorLine(cursorLine)
 
-                }
+                }*/
 
             }
             MouseArea{
@@ -302,13 +304,14 @@ Rectangle{
         lockBar=true
         var cursorPos=textEditInput.cursorPosition
 
-        string=toRichText(string)
+        //string=toRichText(string)
         textEditInput.remove(0,textEditInput.length)
-        textEditInput.insert(0,"<pre>"+string+"</pre>")
+        textEditInput.insert(0,string)
+        //textEditInput.insert(0,"<pre>"+string+"</pre>")
 
 
         lockBar=false
-        displayColorTextAll()
+       // displayColorTextAll()
 
         textEditInput.cursorPosition=cursorPos
         ensureVisible(textEditInput.cursorRectangle)
@@ -349,7 +352,7 @@ Rectangle{
         textProv=textEditInput.getText(start,end)
 
         displayColorText()
-        //console.debug(textProv)
+        //console.debug(textProv) &#13;
         /*
         if(line==1){
             textProv="<pre>"+textProv

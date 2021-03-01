@@ -31,7 +31,8 @@ public:
     void startProgramm();*/
     void compileProgram(QString arg_program);
     static vector<QString> split(QString _str, char delimiter);
-
+public slots:
+    void programFinished();
 signals:
     void newOutput(QString output);
     void newRunningProgram(QString programm);
@@ -44,7 +45,9 @@ private:
     void print(QString arg_print);
     void replaceString(vector<vector<QString>> *arg_vec,QString arg_currentString,QString arg_newString, unsigned int startX);
     VariableSet *varSet;
+    BracketList *brackets;
     CommandList comList;
+
     /*
 x = 1
 

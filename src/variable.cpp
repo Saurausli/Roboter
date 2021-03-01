@@ -17,11 +17,9 @@ Variable::Variable(VariableType arg_type,QString arg_name)
             break;
 
     }
-    ;
 }
 
 void Variable::setValue(QString arg_value){
-    qDebug()<<"string "<<name<<" "<<arg_value;
     try {
         value=arg_value;
         switch (type) {
@@ -36,23 +34,19 @@ void Variable::setValue(QString arg_value){
     catch(Error *er){
         qDebug()<<er->getMessage();
     }
-    qDebug()<<value;
 }
 
 void Variable::setValue(int arg_value){
-    qDebug()<<"int";
     value=QString::number(arg_value);
 }
 
 void Variable::setValue(bool arg_value){
-    qDebug()<<"bool "<<name;
     if(arg_value){
         value=BoolValueTrue;
     }
     else{
         value=BoolValueFalse;
     }
-    qDebug()<<arg_value;
 }
 
 void Variable::setType(VariableType arg_type){
@@ -124,6 +118,7 @@ void Variable::getVariableTypeFromString(QString arg_name, VariableType &var_Typ
 vector<QString> Variable::getVariableTypeSyntax(){
     vector<QString> ret;
     ret.push_back(VariableSyntaxInteger);
+    ret.push_back(VariableSyntaxBool);
     return ret;
 }
 
@@ -140,6 +135,16 @@ void Variable::checkBool(QString arg_value){
     if(!(arg_value==BoolValueTrue||arg_value==BoolValueFalse)){
         throw(new Error("bool value wrong "+arg_value));
     }
+}
+
+QString Variable::getVariableTypeName(VariableType arg_type){
+    if(arg_type==VariableType::Integer){
+        return VariableSyntaxInteger;
+    }
+    if(arg_type==VariableType::Boolean){
+        return VariableSyntaxBool;
+    }
+    return "";
 }
 
 void Variable::varSetup(VariableType arg_type,QString arg_name){

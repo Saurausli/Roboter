@@ -152,6 +152,8 @@ Window {
                     text: qsTr("")
                     font.pixelSize: 15
                     color: "white"
+                    bottomPadding: 20
+                    //anchors.bottomMargin: 10
                     Connections{
                         target: Backend
                         onNewOutput:{

@@ -13,6 +13,12 @@
 
 #define OperatorSyntaxAND "&&"
 #define OperatorSyntaxOR "||"
+#define OperatorSyntaxGreater ">"
+#define OperatorSyntaxLess "<"
+#define OperatorSyntaxGreaterOrEqual ">="
+#define OperatorSyntaxGreaterOrLess "<="
+#define OperatorSyntaxNotEqual "!="
+#define OperatorSyntaxDoubleEqual "=="
 
 #define OperatorSyntaxEqual "="
 
@@ -35,6 +41,12 @@ enum Operator{
     divide,
     andBin,
     orBin,
+    greater,
+    less,
+    greaterOrEqual,
+    greaterOrLess,
+    notEqual,
+    doubleEqual,
 };
 
 enum Task{
