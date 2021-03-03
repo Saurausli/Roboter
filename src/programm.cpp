@@ -17,9 +17,8 @@ void Programm::compileProgram(QString arg_program){
         print("\n----------------------Start Preparation----------------------\n");
         comList.clear();
         comList.shrink_to_fit();
-        varSet = new VariableSet;
+        programData= new ProgramData;
         errorList = new ErrorList;
-        brackets = new BracketList;
         ////---------------------------------------------------------------------------------////
         ////-----------------------------------PREPARATION-----------------------------------////
         ////---------------------------------------------------------------------------------////
@@ -66,17 +65,14 @@ void Programm::compileProgram(QString arg_program){
             try{
                 for(unsigned int j=0;j<stringProgram[i].size();j++){
                     if(Operation::isNumber(stringProgram[i][j])){
-                        varSet->push_back(new Variable(VariableType::Integer,"#int_"+stringProgram[i][j],stringProgram[i][j]));
+                        programData->varSet.push_back(new Variable(VariableType::Integer,"#int_"+stringProgram[i][j],stringProgram[i][j]));
                         replaceString(&stringProgram,stringProgram[i][j],"#int_"+stringProgram[i][j],i);
                         }
                     else if(Operation::isBool(stringProgram[i][j])){
-                        varSet->push_back(new Variable(VariableType::Boolean,"#boolean_"+stringProgram[i][j],stringProgram[i][j]));
+                        programData->varSet.push_back(new Variable(VariableType::Boolean,"#boolean_"+stringProgram[i][j],stringProgram[i][j]));
                         replaceString(&stringProgram,stringProgram[i][j],"#boolean_"+stringProgram[i][j],i);
                         }
                     }
-
-
-
             }
             catch(Error *er){
                 er->setLine(i);
@@ -92,7 +88,7 @@ void Programm::compileProgram(QString arg_program){
 
         for(unsigned long i=0;i<stringProgram.size();i++){
             try{
-                comList.push_back(new Command(varSet,brackets,stringProgram[i]));
+                comList.push_back(new Command(programData,stringProgram[i]));
                 if(comList.size()>1&&errorList->size()==0){
                     connect(comList[i-1],SIGNAL(nextLine()),comList[i],SLOT(exec()));
                 }
@@ -147,14 +143,14 @@ vector<QString> Programm::split(QString _str, char delimiter) {
 void Programm::programFinished(){
     print("\n-------------------------End Program-------------------------\n");
     print("\n-----------------------System Variable-----------------------\n");
-    for(unsigned i=0;i<varSet->size();i++){
-        if((*varSet)[i]->getName().left(1)=="#")
-            print(Variable::getVariableTypeName((*varSet)[i]->getVariableType())+" "+(*varSet)[i]->getName()+" = "+(*varSet)[i]->getValue());
+    for(unsigned i=0;i<programData->varSet.size();i++){
+        if(programData->varSet[i]->getName().left(1)=="#")
+            print(Variable::getVariableTypeName(programData->varSet[i]->getVariableType())+" "+programData->varSet[i]->getName()+" = "+programData->varSet[i]->getValue());
     }
     print("\n------------------------User Variable------------------------\n");
-    for(unsigned i=0;i<varSet->size();i++){
-        if((*varSet)[i]->getName().left(1)!="#")
-            print(Variable::getVariableTypeName((*varSet)[i]->getVariableType())+" "+(*varSet)[i]->getName()+" = "+(*varSet)[i]->getValue());
+    for(unsigned i=0;i<programData->varSet.size();i++){
+        if(programData->varSet[i]->getName().left(1)!="#")
+            print(Variable::getVariableTypeName(programData->varSet[i]->getVariableType())+" "+programData->varSet[i]->getName()+" = "+programData->varSet[i]->getValue());
     }
     emit programmFinished();
 }

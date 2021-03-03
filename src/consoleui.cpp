@@ -50,6 +50,7 @@ QString ConsoleUi::colorIn(QString arg_line){
     arg_line=" "+arg_line+" ";
     vector<QString> keywords=Variable::getVariableTypeSyntax();
     colorKeyWord(arg_line,keywords,"#d69aa7");
+    return arg_line;
 }
 
 void ConsoleUi::colorKeyWord(QString& arg_line,vector<QString> arg_keywords,QString arg_color){

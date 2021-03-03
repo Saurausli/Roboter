@@ -25,6 +25,10 @@
 #define OperationBeginSyntax "("
 #define OperationEndSyntax ")"
 
+
+#define Bracket_Opening "{"
+#define Bracket_Closing "}"
+
 #define DEF_COMMENT_SYNTAX "//"
 
 struct subOperationStruct{

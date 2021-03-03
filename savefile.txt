@@ -1,8 +1,20 @@
-int i=0
-int j=1
-bool b=true
-if(i<j&&b){
-	while(i<9){
-		i=i+1
+main{
+	bool b=true
+	bool c=false
+	int i=2
+	int k=2
+
+	if(b){
+		i=1
+		if(c){
+			k=3
+		}
+		else{
+			k=23
+		}	
+	}
+	else{
+		i=12
+		b=true
 	}
 }

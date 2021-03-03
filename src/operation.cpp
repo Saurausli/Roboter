@@ -85,6 +85,8 @@ vector<QString> Operation::getOperatorSyntax(){
     opVec.push_back(OperatorSyntaxGreaterOrLess);
     opVec.push_back(OperatorSyntaxNotEqual);
     opVec.push_back(OperatorSyntaxDoubleEqual);
+    opVec.push_back(Bracket_Opening);
+    opVec.push_back(Bracket_Closing);
     return opVec;
 }
 

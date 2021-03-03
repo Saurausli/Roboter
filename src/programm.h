@@ -44,10 +44,8 @@ protected:
 private:
     void print(QString arg_print);
     void replaceString(vector<vector<QString>> *arg_vec,QString arg_currentString,QString arg_newString, unsigned int startX);
-    VariableSet *varSet;
-    BracketList *brackets;
     CommandList comList;
-
+    ProgramData *programData;
     /*
 x = 1
 

@@ -11,9 +11,10 @@
 
 #define Basic_Command_While "while"
 #define Basic_Command_If "if"
+#define Basic_Command_Else "else"
+#define Basic_Command_Main "main"
 
-#define Bracket_Opening "{"
-#define Bracket_Closing "}"
+
 
 
 enum BasicCommand{
@@ -21,14 +22,21 @@ enum BasicCommand{
     Set,
     While,
     If,
+    Else,
     ClosingBracket,
-    Define
+    Define,
+    Main,
 };
 
 using namespace std;
 
 
 class Command;
+class IfElse;
+class Bracket;
+typedef std::vector<IfElse*> IfElseList;
+typedef std::vector<Command*> CommandList;
+typedef std::vector<Bracket*> BracketList;
 
 class Bracket{
     public:
@@ -43,20 +51,46 @@ class Bracket{
         bool closed=false;
 };
 
-typedef std::vector<Bracket*> BracketList;
+class IfElse{
+    public:
+        IfElse (Command *arg_ifOperation,Bracket *arg_parentBracket);
+        bool isClosed();
+        void close();
+        void close(Command *arg_elseOperation);
+        Command *getElseOperation();
+        Command *getIfOperation();
+        Bracket *getBracket();
+        bool isElseDefined();
+    private:
+        Command *ifOperation;
+        Command *elseOperation;
+        bool closed=false;
+        bool elseDefined=false;
+        Bracket *parentBracket;
+};
 
-typedef std::vector<Command*> CommandList;
+
+
+
+
+struct ProgramData{
+    BracketList bracketList;
+    IfElseList ifElseList;
+    CommandList CommandList;
+    VariableSet varSet;
+};
 
 class Command:public QObject
 {
     Q_OBJECT
     public:
-        explicit Command(VariableSet *arg_varSet,BracketList *arg_brackets,vector<QString> arg_command, QObject *parent= nullptr);
+        explicit Command(ProgramData *arg_programData,vector<QString> arg_command, QObject *parent= nullptr);
         ~Command();
         void checkIfAllBracketsClosed();
         BasicCommand getBasicCommand();
         static QVector<QString> getBasicCommandName();
         static BasicCommand getBasicCommandFromString(QString arg_name);
+        OperationList* getOperationList();
     public slots:
         void exec();
         void toNextLine();
@@ -65,17 +99,20 @@ class Command:public QObject
         void nextLine();
         void toEndBracket();
 private:
-    VariableSet *varSet;
+    ProgramData *programData;
     BasicCommand bcommand;
     OperationList commandOperation;
     Variable* defineVar;
-    BracketList* brackets;
     vector<QString> command;
-
+    Command* parentIf;
+    Bracket* parentBracket;
     void checkIfBracketsOpen(); 
-    Bracket* getOpeningBracket();
-
+    Bracket* getBracket();
+    Bracket* getParentBracket();
+    IfElse* getOpenIfElse();
+    IfElse* getIfElseFromElse();
     bool checkIfIsBasicCommand(QString arg_name);
+    int getIntArgument(BasicCommand arg_bcommand);
     void checkString(QString &arg_currentString,QString arg_expectedString);
     void setupBracktHead(QString arg_name);
   };
