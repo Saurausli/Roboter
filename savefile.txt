@@ -2,19 +2,22 @@ main{
 	bool b=true
 	bool c=false
 	int i=2
-	int k=2
 
-	if(b){
+	if(b&&false){
 		i=1
-		if(c){
-			k=3
-		}
-		else{
-			k=23
-		}	
+	
 	}
-	else{
+else if(10>11){
+		i=32
+	}
+	else if(10>11){
 		i=12
 		b=true
 	}
+	else if(10>11){
+		i=42
+	}
+else{
+i=-23
+}
 }

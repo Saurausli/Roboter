@@ -12,6 +12,8 @@
 #define Basic_Command_While "while"
 #define Basic_Command_If "if"
 #define Basic_Command_Else "else"
+#define Basic_Command_ElseIf "elseif"
+#define Basic_Command_ElseIf_Textversion "else if"
 #define Basic_Command_Main "main"
 
 
@@ -23,6 +25,7 @@ enum BasicCommand{
     While,
     If,
     Else,
+    ElseIf,
     ClosingBracket,
     Define,
     Main,
@@ -40,11 +43,12 @@ typedef std::vector<Bracket*> BracketList;
 
 class Bracket{
     public:
-        Bracket (Command *arg_startOperation);
+        Bracket (Command *arg_startOperation,VariableSet arg_varSet);
         bool isClosed();
         void close(Command *arg_endOperation);
         Command *getEndOperation();
         Command *getStartOperation();
+        VariableSet varSet;
     private:
         Command *startOperation;
         Command *endOperation;
@@ -61,9 +65,14 @@ class IfElse{
         Command *getIfOperation();
         Bracket *getBracket();
         bool isElseDefined();
+        void addElseIf(Command *arg_elseIf);
+        CommandList *getElseIfList();
+        Command *getLastIf();
+        Command *getPreviousIf(Command *arg_elseIf);
     private:
         Command *ifOperation;
         Command *elseOperation;
+        CommandList elseIf;
         bool closed=false;
         bool elseDefined=false;
         Bracket *parentBracket;
@@ -111,6 +120,8 @@ private:
     Bracket* getParentBracket();
     IfElse* getOpenIfElse();
     IfElse* getIfElseFromElse();
+    IfElse* getIfElseFromElseIf();
+    bool getPreviousIfResult();
     bool checkIfIsBasicCommand(QString arg_name);
     int getIntArgument(BasicCommand arg_bcommand);
     void checkString(QString &arg_currentString,QString arg_expectedString);

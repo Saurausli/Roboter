@@ -11,6 +11,7 @@
 #define OperatorSyntaxMultiply  "*"
 #define OperatorSyntaxDivide "/"
 
+
 #define OperatorSyntaxAND "&&"
 #define OperatorSyntaxOR "||"
 #define OperatorSyntaxGreater ">"
@@ -19,6 +20,9 @@
 #define OperatorSyntaxGreaterOrLess "<="
 #define OperatorSyntaxNotEqual "!="
 #define OperatorSyntaxDoubleEqual "=="
+
+#define SignSyntaxNot "!"
+#define SignSyntaxMinus "-"
 
 #define OperatorSyntaxEqual "="
 
@@ -52,6 +56,12 @@ enum Operator{
     notEqual,
     doubleEqual,
 };
+enum Sign{
+    negativ,
+    positiv,
+    neutral,
+    notSign,
+};
 
 enum Task{
     defineVariable,
@@ -61,6 +71,7 @@ enum Task{
 class Operation;
 
 typedef std::vector<Operation*> OperationList;
+typedef std::vector<Sign> SignList;
 
 class Operation
 {
@@ -76,9 +87,12 @@ public:
     void setResultVariable(Variable *arg_var);
 
     static vector<QString> getOperatorSyntax();
+    static vector<QString> getSignSyntax();
     static Operator getOperator(QString arg_operatorName);
+    static Sign getSign(QString arg_signName);
     static int getVariableId(VariableSet *arg_varSet, QString arg_name);
     static bool isOperator(QString &arg_name);
+    static bool isSign(QString &arg_name);
     static bool isNumber(QString &arg_string);
     static bool isBool(QString &arg_string);
 
@@ -88,14 +102,14 @@ public:
     static void checkVarExist(VariableSet *arg_varSet,QString arg_name,int &arg_pos);
     static void checkIfVarNameFree(VariableSet *arg_varSet,QString arg_name);
 
-    static void checkarg_length(vector<QString> &arg_com,unsigned long arg_len);
-    static void checkMinarg_length(vector<QString> &arg_com,unsigned long arg_len);
-    static void checkMaxarg_length(vector<QString> &arg_com,unsigned long arg_len);
-    static void checkMinMaxarg_length(vector<QString> &arg_com,unsigned long arg_min,unsigned long arg_max);
+    static void checklength(vector<QString> &arg_com,unsigned long arg_len);
+    static void checkMinlength(vector<QString> &arg_com,unsigned long arg_len);
+    static void checkMaxlength(vector<QString> &arg_com,unsigned long arg_len);
+    static void checkMinMaxlength(vector<QString> &arg_com,unsigned long arg_min,unsigned long arg_max);
 
     static void checkAllVarType(VariableSet *arg_varSet, VariableType arg_typ);
     static void checkVarType(Variable* arg_var, VariableType arg_typ);
-    static void checkVarTypFromOp(Variable *arg_var,Operator arg_op);
+    static void checkVarTypFromOp(Sign arg_Sign,Variable *arg_var,Operator arg_op);
     static void calc(Variable &arg_var1,Variable &arg_var2,Operator arg_op,Variable &arg_result);
     static void copyVariable(Variable* arg_source, Variable* arg_destination);
 
@@ -108,6 +122,7 @@ private:
 
     vector<Variable*> usedVariable;
     OperationList subOp;
+    SignList signList;
     vector<Operator> usedOperator;
     VariableSet *varSet;
 

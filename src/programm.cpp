@@ -31,10 +31,17 @@ void Programm::compileProgram(QString arg_program){
 
         //make sure Operatorchar are clearly seperated and dont seperat between some char. For Exampel "=" and "==" and no "=" and " =  = "
         arg_program.replace("\t","");
+        arg_program.replace(Basic_Command_ElseIf_Textversion,Basic_Command_ElseIf);
+        vector<QString> signStr;
+        vector<QString> opStr;
+        opStr=Operation::getOperatorSyntax();
+        signStr=Operation::getSignSyntax();
         vector<QString> findStr;
-        findStr=Operation::getOperatorSyntax();
+        findStr.reserve(signStr.size()+opStr.size());
+        findStr.insert(findStr.end(),signStr.begin(),signStr.end());
+        findStr.insert(findStr.end(),opStr.begin(),opStr.end());
         vector<QString> actualStr;
-        actualStr=Operation::getOperatorSyntax();
+        actualStr=findStr;
 
         for(unsigned int i=0;i<findStr.size();i++){
             for(unsigned int j=i+1;j<actualStr.size();j++){

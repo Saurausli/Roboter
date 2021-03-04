@@ -33,20 +33,6 @@ void Operation::exec(){
     for(unsigned int i=1;i<usedVariable.size();i++){
         calc(*result,*usedVariable[i],usedOperator[i-1],*result);
     }
-
-/*switch (task) {
-    case Task::defineVariable:
-        defineVar->define();
-        break;
-    case Task::calculet:
-        for(unsigned i=0;i<subOpList.size();i++){
-            subOpList[i]->exec();
-        }
-        if(subOpList.size()>0){
-            result->setValue(subOpList[subOpList.size()-1]->getResult()->getValuetoInt());
-        }
-        break;
-    }*/
 }
 
 
@@ -67,14 +53,13 @@ void Operation::setupDefine(VariableSet *arg_varSet,QString arg_name, VariableTy
     task=Task::defineVariable;*/
 }
 
-
 vector<QString> Operation::getOperatorSyntax(){
     vector<QString> opVec;
     opVec.push_back(OperatorSyntaxPlus);
     opVec.push_back(OperatorSyntaxMinus);
     opVec.push_back(OperatorSyntaxEqual);
     opVec.push_back(OperatorSyntaxMultiply);
-    opVec.push_back(OperatorSyntaxDivide);
+    opVec.push_back(OperatorSyntaxDivide); 
     opVec.push_back(OperationEndSyntax);
     opVec.push_back(OperationBeginSyntax);
     opVec.push_back(OperatorSyntaxAND);
@@ -90,9 +75,27 @@ vector<QString> Operation::getOperatorSyntax(){
     return opVec;
 }
 
+vector<QString> Operation::getSignSyntax(){
+    vector<QString> signVec;
+    signVec.push_back(SignSyntaxNot);
+    signVec.push_back(SignSyntaxMinus);
+    return signVec;
+}
+
 bool Operation::isOperator(QString &arg_name){
     vector<QString> op;
     op=getOperatorSyntax();
+    for(unsigned int i=0;i<op.size();i++){
+        if(op[i]==arg_name){
+            return true;
+        }
+    }
+    return false;
+}
+
+bool Operation::isSign(QString &arg_name){
+    vector<QString> op;
+    op=getSignSyntax();
     for(unsigned int i=0;i<op.size();i++){
         if(op[i]==arg_name){
             return true;
@@ -147,6 +150,19 @@ Operator Operation::getOperator(QString arg_operatorName){
     return Operator::none;
 }
 
+Sign Operation::getSign(QString arg_signName){
+    if(arg_signName==SignSyntaxNot){
+        return Sign::notSign;
+    }
+    if(arg_signName==SignSyntaxMinus){
+        return Sign::negativ;
+    }
+    if(arg_signName==SignSyntaxMinus){
+        return Sign::negativ;
+    }
+    return Sign::neutral;
+}
+
 bool Operation::isNumber(QString &arg_string){
     bool ok;
     arg_string.toInt(&ok,10);
@@ -185,11 +201,11 @@ void Operation::checkVarExist(VariableSet *arg_varSet,QString arg_name,int &arg_
     throw(new Error(arg_name+" not defined"));
 }
 
-void Operation::checkVarTypFromOp(Variable *arg_var,Operator arg_op){
-    if((arg_op==Operator::plus||arg_op==Operator::minus||arg_op==Operator::multiply||arg_op==Operator::divide)&&arg_var->getVariableType()==VariableType::Integer){
+void Operation::checkVarTypFromOp(Sign arg_Sign,Variable *arg_var,Operator arg_op){
+    if((arg_Sign==Sign::negativ||arg_Sign==Sign::neutral)&&(arg_op==Operator::plus||arg_op==Operator::minus||arg_op==Operator::multiply||arg_op==Operator::divide)&&arg_var->getVariableType()==VariableType::Integer){
         return;
     }
-    if((arg_op==Operator::andBin||arg_op==Operator::orBin)&&arg_var->getVariableType()==VariableType::Boolean){
+    if((arg_Sign==Sign::notSign||arg_Sign==Sign::neutral)&&(arg_op==Operator::andBin||arg_op==Operator::orBin)&&arg_var->getVariableType()==VariableType::Boolean){
         return;
     }
     throw(new Error("incompatible operator"));
@@ -198,11 +214,18 @@ void Operation::checkVarTypFromOp(Variable *arg_var,Operator arg_op){
 void Operation::setupCalc(VariableSet *arg_varSet,vector<QString> arg_operation){
     varSet=arg_varSet;
     bool operatorPossible=false;
-    bool varExpected=true;
+    bool varPossible=true;
+    bool varExpected=false;
     result = new Variable(VariableType::unknown,"res");
     for(unsigned int i=0;i<arg_operation.size();i++){
-        if(varExpected){
-            if(arg_operation[i]==OperationBeginSyntax){
+        if(isSign(arg_operation[i])&&varPossible){
+            signList.push_back(getSign(arg_operation[i]));
+            varExpected=true;
+            varPossible=false;
+            operatorPossible=false;
+        }
+        else if(varExpected||varPossible){
+            if(arg_operation[i]==OperationBeginSyntax){ //if arg[i] == '('
                 bool found=false;
                 unsigned int foundIndex=i+1;
                 int openBrackets=1;
@@ -216,7 +239,7 @@ void Operation::setupCalc(VariableSet *arg_varSet,vector<QString> arg_operation)
                     else if(arg_operation[foundIndex]==OperationEndSyntax){
                         openBrackets--;
                     }
-                    if(openBrackets==0){
+                    if(openBrackets==0){// add new Suboperation
                         if(i+1==foundIndex){
                             throw(new Error("expected expression 1"));
                         }
@@ -228,9 +251,10 @@ void Operation::setupCalc(VariableSet *arg_varSet,vector<QString> arg_operation)
                     else{
                         foundIndex++;
                     }
+
                 }
             }
-            else if(isVariable(varSet,arg_operation[i])){
+            else if(isVariable(varSet,arg_operation[i])){//add Variable
                 checkVarExist(varSet,arg_operation[i]);
                 usedVariable.push_back(getVariable(varSet,arg_operation[i]));
             }
@@ -238,17 +262,21 @@ void Operation::setupCalc(VariableSet *arg_varSet,vector<QString> arg_operation)
             else{
                 throw(new Error("expected expression 2"));
             }
+            if(varPossible){
+                signList.push_back(Sign::neutral);
+            }
             varExpected=false;
+            varPossible=false;
             operatorPossible=true;
         }
 
         else if(arg_operation[i]==DEF_COMMENT_SYNTAX){ // found Comment
             break;
         }
-
         else if(operatorPossible&&isOperator(arg_operation[i])){ // found Operator
             usedOperator.push_back(getOperator(arg_operation[i]));
-            varExpected=true;
+            varExpected=false;
+            varPossible=true;
             operatorPossible=false;
         }
         else{ // found neither Variable nor Operator nor Comment
@@ -260,24 +288,24 @@ void Operation::setupCalc(VariableSet *arg_varSet,vector<QString> arg_operation)
     }
 }
 
-void Operation::checkarg_length(vector<QString> &arg_com,unsigned long arg_len){
-    checkMinarg_length(arg_com,arg_len);
-    checkMaxarg_length(arg_com,arg_len);
+void Operation::checklength(vector<QString> &arg_com,unsigned long arg_len){
+    checkMinlength(arg_com,arg_len);
+    checkMaxlength(arg_com,arg_len);
 }
 
-void Operation::checkMinarg_length(vector<QString> &arg_com,unsigned long arg_len){
+void Operation::checkMinlength(vector<QString> &arg_com,unsigned long arg_len){
     if(arg_com.size()<arg_len){
         throw(new Error("to few arguments: found: "+QString::number(arg_com.size())+" minimum: "+QString::number(arg_len)));
     }
 }
-void Operation::checkMaxarg_length(vector<QString> &arg_com,unsigned long arg_len){
+void Operation::checkMaxlength(vector<QString> &arg_com,unsigned long arg_len){
     if(arg_com.size()>arg_len){
         throw(new Error("to many arguments: found: "+QString::number(arg_com.size())+" maximum: "+QString::number(arg_len)));
     }
 }
-void Operation::checkMinMaxarg_length(vector<QString> &arg_com,unsigned long arg_min,unsigned long arg_max){
-    checkMinarg_length(arg_com,arg_min);
-    checkMaxarg_length(arg_com,arg_max);
+void Operation::checkMinMaxlength(vector<QString> &arg_com,unsigned long arg_min,unsigned long arg_max){
+    checkMinlength(arg_com,arg_min);
+    checkMaxlength(arg_com,arg_max);
 }
 
 void Operation::checkAllVarType(VariableSet *arg_varSet, VariableType arg_typ){

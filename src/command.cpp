@@ -1,8 +1,9 @@
 #include "command.h"
 
 
-Bracket::Bracket (Command *arg_startOperation){
+Bracket::Bracket (Command *arg_startOperation,VariableSet arg_varSet){
     startOperation=arg_startOperation;
+    varSet=arg_varSet;
 }
 
 bool Bracket::isClosed(){
@@ -64,6 +65,31 @@ bool IfElse::isElseDefined(){
     return elseDefined;
 }
 
+void IfElse::addElseIf(Command *arg_elseIf){
+    elseIf.push_back(arg_elseIf);
+}
+CommandList *IfElse::getElseIfList(){
+    return &elseIf;
+}
+
+Command *IfElse::getLastIf(){
+    if(elseIf.size()>0){
+        return elseIf[elseIf.size()-1];
+    }
+    else{
+        return ifOperation;
+    }
+}
+
+Command *IfElse::getPreviousIf(Command *arg_elseIf){
+    for(unsigned i=1;i<elseIf.size();i++){
+        if(elseIf[i]==arg_elseIf){
+            return elseIf[i-1];
+        }
+    }
+    return ifOperation;
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -78,6 +104,7 @@ Command::Command(ProgramData *arg_programData,vector<QString> arg_command, QObje
     programData=arg_programData;
     command=arg_command;
     parentBracket=getParentBracket();
+    //////////////////////define//////////////////////
     if(command.size()>1){
         if(Variable::checkIfIsVariableType(command[0])){
             Operation::checkIfVarNameFree(&programData->varSet,command[1]);
@@ -88,6 +115,7 @@ Command::Command(ProgramData *arg_programData,vector<QString> arg_command, QObje
             bcommand=BasicCommand::Define;
         }
     }
+    ////////////////////////set///////////////////////
     if(command.size()>1){
         if(command[1]==OperatorSyntaxEqual){
             Operation::checkVarExist(&programData->varSet,command[0]);
@@ -96,31 +124,14 @@ Command::Command(ProgramData *arg_programData,vector<QString> arg_command, QObje
             commandOperation.push_back(new Operation(&programData->varSet,tempVec));
             bcommand=BasicCommand::Set;
         }
-        /*else if(command[0]==Basic_Command_Else&&command[1]==Bracket_Opening&&command.size()==2){
-            vector<QString> tempVec(&command[2],&command[command.size()-2]);
 
-            programData->bracketList.push_back(new Bracket(this));
-            if(programData->ifElseList.size()>0){
-                if(programData->ifElseList[programData->ifElseList.size()-1]->isClosed()){
-                    throw(new Error("expected expression"));
-                }
-                programData->ifElseList[programData->ifElseList.size()-1]->close(this);
-                bcommand=BasicCommand::Else;
-            }
-            else{
-                throw(new Error("expected expression"));
-            }
-
-        }*/
         else if(checkIfIsBasicCommand(command[0])){
             if(command[0]==Basic_Command_Else){
                     if(getOpenIfElse()==nullptr){
                         throw(new Error("if statment missing 1"));
                     }
                     if(parentBracket==getOpenIfElse()->getBracket()){
-
                         getOpenIfElse()->close(this);
-
                     }
                     else{
                        throw(new Error("if statment missing 2"));
@@ -129,6 +140,9 @@ Command::Command(ProgramData *arg_programData,vector<QString> arg_command, QObje
             setupBracktHead(command[0]);
             if(bcommand==BasicCommand::If){
                 programData->ifElseList.push_back(new IfElse(this,parentBracket));
+            }
+            else if(bcommand==BasicCommand::ElseIf){
+                getOpenIfElse()->addElseIf(this);
             }
         }
         else{
@@ -152,7 +166,8 @@ Command::Command(ProgramData *arg_programData,vector<QString> arg_command, QObje
     command=_command;
     globalVariables=&_globalVariables;
     checkCommand();*/
-    if(bcommand!=BasicCommand::Empty&&bcommand!=BasicCommand::If&&bcommand!=BasicCommand::Else&&programData->ifElseList.size()>0){
+    if(bcommand!=BasicCommand::ElseIf&&bcommand!=BasicCommand::Empty&&
+            bcommand!=BasicCommand::If&&bcommand!=BasicCommand::Else&&programData->ifElseList.size()>0){
         IfElse *ifElse_ptr=getOpenIfElse();
         if(ifElse_ptr!=nullptr){
             if(parentBracket==ifElse_ptr->getBracket()){
@@ -184,6 +199,7 @@ QVector<QString> Command::getBasicCommandName(){
     res.push_back(Basic_Command_If);
     res.push_back(Basic_Command_Else);
     res.push_back(Basic_Command_Main);
+    res.push_back(Basic_Command_ElseIf);
     return res;
 }
 
@@ -194,6 +210,9 @@ BasicCommand Command::getBasicCommandFromString(QString arg_name){
     }
     else if(Basic_Command_If==arg_name){
         return BasicCommand::If;
+    }
+    else if(Basic_Command_ElseIf==arg_name){
+        return BasicCommand::ElseIf;
     }
     else if(Basic_Command_Else==arg_name){
         return BasicCommand::Else;
@@ -210,7 +229,6 @@ OperationList* Command::getOperationList(){
 }
 
 void Command::exec(){
-    qDebug()<<"\n"<<command<<"\n";
     for(unsigned int i=0;i<commandOperation.size();i++){
         commandOperation[i]->exec();
     }
@@ -227,6 +245,24 @@ void Command::exec(){
                 emit toEndBracket();
             }
             break;
+        case BasicCommand::ElseIf:
+            if(!getPreviousIfResult()){
+                toNextLine();
+            }
+
+            else{
+                emit toEndBracket();
+            }
+            break;
+        case BasicCommand::Else:
+
+            if(!getPreviousIfResult()){
+                toNextLine();
+            }
+            else{
+                emit toEndBracket();
+            }
+            break;
         case BasicCommand::While:
             if(commandOperation[0]->getResult()->getValuetoBool()){
                 toNextLine();
@@ -235,15 +271,7 @@ void Command::exec(){
                 emit toEndBracket();
             }
             break;
-        case BasicCommand::Else:
-            qDebug()<<!(*getIfElseFromElse()->getIfOperation()->getOperationList())[0]->getResult()->getValuetoBool();
-            if(!(*getIfElseFromElse()->getIfOperation()->getOperationList())[0]->getResult()->getValuetoBool()){
-                toNextLine();
-            }
-            else{
-                emit toEndBracket();
-            }
-            break;
+
 
         case BasicCommand::ClosingBracket:
             switch(getBracket()->getStartOperation()->getBasicCommand()){
@@ -252,6 +280,9 @@ void Command::exec(){
                     break;
                 case BasicCommand::While:
                     getBracket()->getStartOperation()->exec();
+                    break;
+                case BasicCommand::ElseIf:
+                    toNextLine();
                     break;
                 case BasicCommand::Else:
                     toNextLine();
@@ -322,6 +353,38 @@ IfElse* Command::getIfElseFromElse(){
     return nullptr;
 }
 
+IfElse* Command::getIfElseFromElseIf(){
+    for(unsigned i=0;i<programData->ifElseList.size();i++){
+        for(unsigned j=0;j<programData->ifElseList[i]->getElseIfList()->size();j++){
+        if((*programData->ifElseList[i]->getElseIfList())[j]==this){
+            return programData->ifElseList[i];
+            }
+        }
+    }
+    return nullptr;
+}
+
+bool Command::getPreviousIfResult(){
+    IfElse *ifelseTemp=getIfElseFromElseIf();
+    if(ifelseTemp==nullptr){
+        ifelseTemp=getIfElseFromElse();
+
+    }
+    bool res=(*ifelseTemp->getIfOperation()->getOperationList())[0]->getResult()->getValuetoBool();
+        for (unsigned i=0;i<ifelseTemp->getElseIfList()->size();i++) {
+           if(res){
+               return res;
+           }
+           else if((*ifelseTemp->getElseIfList())[i]==this){
+               return res;
+           }
+           if((*(*ifelseTemp->getElseIfList())[i]->getOperationList())[0]->getResult()->getValuetoBool()){
+               return true;
+           }
+        }
+    return res;
+}
+
 bool Command::checkIfIsBasicCommand(QString arg_name){
     QVector<QString> vec= getBasicCommandName();
     for (int i=0;i<vec.size();i++) {
@@ -337,6 +400,8 @@ int Command::getIntArgument(BasicCommand arg_bcommand){
         case BasicCommand::If:
             return 1;
         case BasicCommand::While:
+            return 1;
+        case BasicCommand::ElseIf:
             return 1;
         case BasicCommand::Else:
             return 0;
